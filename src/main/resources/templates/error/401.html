@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{fragment/layout}">
+
+<head>
+	<title>Error</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container">
+
+		<div class="jumbotron">
+			<h1><i class="far fa-frown"></i> [[#{error.code401.title}]]</h1>
+			<p>
+				[[#{error.code401.description.p1}]]
+				<a data-toggle="modal" data-target="#modalLRFormDemo" href="#">
+					[[#{error.code401.description.p2}]]
+				</a>
+				[[#{error.code401.description.p3}]]
+			</p>
+			<p>
+				<a class="btn btn-lg btn-primary" th:href="@{'/' + ${#locale}}" role="button">
+					[[#{home}]]
+					&raquo;</a>
+			</p>
+		</div>
+	</div>
+</body>
+
+</html>

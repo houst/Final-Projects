@@ -1,0 +1,86 @@
+<!DOCTYPE HTML>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{fragment/layout}">
+
+<head>
+	<title>[[#{seance.list}]]</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container">
+
+		<div class="jumbotron">
+			<h1><span th:utext="#{seance.list}"></span></h1>
+			<a class="btn btn-success btn-sm" th:href="@{'/' + ${#locale} + '/seance' + '/add'}">
+				<i class="fas fa-plus"></i>
+				<span th:utext="#{add}"></span>
+			</a>
+			<td th:if="${seanceadded}">Success</td>
+			<p>
+				<table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th class="text-center">[[ #{seance.start-date-time} ]]</th>
+							<th class="text-center">[[ #{movie} ]]</th>
+							<th class="text-center">[[ #{movie.duration} ]]</th>
+							<th class="text-center">[[ #{actions} ]]</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${seances.empty}">
+							<td class="text-center" colspan="999"> No seances available </td>
+						</tr>
+						<tr th:each="seance : ${seances}">
+							<td class="pt-3-half">[[ ${seance.startDateTime} ]]</td>
+							<td class="pt-3-half">[[ ${seance.movie.title} ]]</td>
+							<td class="pt-3-half">[[ ${seance.movie.duration} ]]</td>
+							<td>
+								<span class="table-edit">
+									<a th:href="@{'/' + ${#locale} + '/seance/' + ${seance.id} + '/edit'}"
+										class="btn btn-outline-warning btn-rounded btn-sm px-2 waves-effect waves-light">
+										<i class="fas fa-pencil-alt mt-0"></i>
+									</a>
+								</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</p>
+			<div class="row">
+				<div class="col-sm-12 col-md-5">
+					<div class="dataTables_info">
+						[[#{pagination.showing}]] 
+						[[${(seances.number + 1) * seances.size - seances.size + 1}]]
+						[[#{pagination.to}]]
+						<span th:text="${((seances.number + 1) * seances.size) > seances.totalElements ? seances.totalElements : ((seances.number + 1) * seances.size)}"></span>
+						[[#{pagination.of}]]
+						[[${seances.totalElements}]]
+						[[#{pagination.entries}]]
+					</div>
+				</div>
+				<div class="col-sm-12 col-md-7">
+					<div class="dataTables_paginate paging_simple_numbers text-right" 
+						th:if="${seances.totalElements > seances.size}">
+						<ul class="pagination">
+							<li th:class="${seances.hasPrevious()} ? 'paginate_button page-item previous' : 'paginate_button page-item previous disabled'">
+								<a th:href="@{'/' + ${#locale} + '/seances'(page=${seances.number})}" class="page-link">
+									[[#{pagination.previous}]]
+								</a>
+							</li>
+							<li th:each="pageNumber : ${pageNumbers}" 
+								th:class="${pageNumber==seances.number + 1} ? 'paginate_button page-item active' : 'paginate_button page-item'">
+								<a th:href="@{'/' + ${#locale} + '/seances'(page=${pageNumber})}" class="page-link">[[ ${pageNumber} ]]</a>
+							</li>
+							<li th:class="${seances.hasNext()} ? 'paginate_button page-item next' : 'paginate_button page-item next disabled'">
+								<a th:href="@{'/' + ${#locale} + '/seances'(page=${seances.number + 2})}" class="page-link">
+									[[#{pagination.next}]]
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

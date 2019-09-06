@@ -1,0 +1,304 @@
+<header th:fragment="header" xmlns:th="http://www.w3.org/1999/xhtml"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+
+				<!-- Navbar -->
+				<nav class="mb-3 navbar navbar-expand-lg navbar-dark orange">
+					<a class="navbar-brand" th:href="@{'/' + ${#locale}}">CINEMA</a>
+					<button class="navbar-toggler" type="button" data-toggle="collapse"
+						data-target="#navbarSupportedContent-4" aria-controls="navbarSupportedContent-4"
+						aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					<div class="collapse navbar-collapse" id="navbarSupportedContent-4">
+
+						<ul class="navbar-nav mr-auto">
+							<li class="nav-item">
+								<a class="nav-link" th:href="@{'/' + ${#locale}}">
+									[[ #{schedule} ]]
+								</a>
+							</li>
+						</ul>
+
+						<ul class="navbar-nav ml-auto">
+
+							<li class="nav-item" sec:authorize="isAnonymous()">
+								<a class="nav-link" data-toggle="modal" data-target="#modalLRFormDemo" href="#">
+									[[ #{login} ]]
+								</a>
+							</li>
+
+							<li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+								<a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-4" data-toggle="dropdown"
+									aria-haspopup="true" aria-expanded="false">
+									<i class="fas fa-user"></i>
+									<span sec:authentication="name"></span>
+
+								</a>
+								<div class="dropdown-menu dropdown-menu-right dropdown-info"
+									aria-labelledby="navbarDropdownMenuLink-4">
+									<a class="dropdown-item" th:href="@{'/' + ${#locale} + '/profile' }">[[#{profile}]]</a>
+									<!-- <a class="dropdown-item" data-toggle="modal" data-target="#centralModalSm">
+										[[#{ticket}]]
+										<span class="badge badge-pill badge-light ml-1 pb-0">
+											<div sec:authentication="principal.getTickets()"></div>
+										</span>
+									</a> -->
+									<div class="dropdown-divider"
+										sec:authorize="hasAuthority('ADMIN')">
+									</div>
+									<h6 class="dropdown-header"
+										sec:authorize="hasAuthority('ADMIN')">
+										[[#{admin.panel}]]
+									</h6>
+									<a class="dropdown-item" th:href="@{'/' + ${#locale} + '/users'}"
+										sec:authorize="hasAuthority('ADMIN')">
+										[[#{user.list}]]
+									</a>
+									<a class="dropdown-item" th:href="@{'/' + ${#locale} + '/movies'}"
+										sec:authorize="hasAuthority('ADMIN')">
+										[[#{movie.list}]]
+									</a>
+									<a class="dropdown-item" th:href="@{'/' + ${#locale} + '/seances'}"
+										sec:authorize="hasAuthority('ADMIN')">
+										[[#{seance.list}]]
+									</a>
+									<div class="dropdown-divider"></div>
+									<a class="dropdown-item logout" href="/logout">[[#{logout}]]</a>
+								</div>
+							</li>
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-5" data-toggle="dropdown"
+									aria-haspopup="true" aria-expanded="false">
+									<i class="fas fa-globe-americas"></i>
+									[[ ${ #locale == new java.util.Locale('ua') ? new java.util.Locale('uk').getDisplayName() : new java.util.Locale(#locale).getDisplayName()} ]]
+								</a>
+								<div class="dropdown-menu dropdown-menu-right dropdown-info"
+									aria-labelledby="navbarDropdownMenuLink-5">
+									<td th:each="prefix : ${#strings.arraySplit(@environment.getProperty('locale.prefixes'), ',')}">
+									<a class="dropdown-item" th:href="@{'/' + ${#strings.length(#httpServletRequest.requestURI) > 3 ? prefix + #strings.substring(#httpServletRequest.requestURI, 3) : prefix}}">
+										<img class="flag" th:src="@{'/img/flags/' + ${prefix} + '.png'}" th:alt="${#strings.toUpperCase(prefix)}">
+										[[ ${ prefix == 'ua' ? new java.util.Locale('uk').getDisplayName() : new java.util.Locale(prefix).getDisplayName()} ]]
+									</a>
+									</td>
+								</div>
+							</li>
+
+						</ul>
+					</div>
+				</nav>
+				<!--/.Navbar -->
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal: Login / Registration Form-->
+	<div class="modal fade" id="modalLRFormDemo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+		style="display: none;" aria-hidden="true"
+		sec:authorize="isAnonymous()">
+
+		<div class="modal-dialog cascading-modal" role="document">
+			<!--Content-->
+			<div class="modal-content">
+
+				<!--Modal cascading tabs-->
+				<div class="modal-c-tabs">
+
+					<!-- Nav tabs -->
+					<ul class="nav nav-tabs md-tabs tabs-2 light-blue darken-3" role="tablist">
+						<li class="nav-item waves-effect waves-light">
+							<a class="nav-link active" data-toggle="tab" href="#panel17" role="tab"
+								aria-selected="true">
+								<i class="fas fa-user mr-1"></i> [[ #{login} ]]</a>
+						</li>
+						<li class="nav-item waves-effect waves-light">
+							<a class="nav-link" data-toggle="tab" href="#panel18" role="tab" aria-selected="false">
+								<i class="fas fa-user-plus mr-1"></i> [[ #{reg} ]]</a>
+						</li>
+					</ul>
+
+					<!-- Tab panels -->
+					<div class="tab-content">
+						<!--Panel 17-->
+						<div class="tab-pane fade in active show" id="panel17" role="tabpanel">
+
+							<!--Body-->
+							<div class="modal-body mb-1">
+								<form method="POST" action="/login" id="login-form" class="needs-validation" novalidate>
+									<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+									<div class="alertify-log alertify-log-error alertify-log-show"
+										style="display:none;margin-top:0">
+										[[ #{login.invalid} ]]
+									</div>
+
+									<div class="md-form form-sm">
+										<i class="fas fa-envelope prefix active"></i>
+										<input type="text" name="email" id="form2" class="form-control form-control-sm"
+											required>
+										<label for="form2" class="active">[[ #{login.email} ]]</label>
+										<div class="invalid-feedback">
+											[[ #{login.email.invalid} ]]
+										</div>
+									</div>
+
+									<div class="md-form form-sm">
+										<i class="fas fa-lock prefix"></i>
+										<input type="password" name="password" id="form3"
+											class="form-control form-control-sm" required>
+										<label for="form3">[[ #{login.password} ]]</label>
+										<div class="invalid-feedback">
+											[[ #{login.password.invalid} ]]
+										</div>
+									</div>
+									<div class="text-center mt-4">
+										<button type="submit" class="btn btn-info waves-effect waves-light">
+											[[ #{login} ]]
+											<i class="fas fa-sign-in ml-1"></i>
+										</button>
+									</div>
+								</form>
+							</div>
+							<!--Footer-->
+							<div class="modal-footer">
+								<div class="options text-center text-md-right mt-1">
+									<p>[[ #{login.password.forgot} ]]
+										<a href="#" class="blue-text">[[ #{login.password.forgot-password} ]]</a>
+									</p>
+								</div>
+								<button type="button" class="btn btn-outline-info waves-effect ml-auto"
+									data-dismiss="modal">[[ #{close} ]]</button>
+							</div>
+
+						</div>
+						<!--/.Panel 7-->
+
+						<!--Panel 18-->
+						<div class="tab-pane fade" id="panel18" role="tabpanel">
+
+							<!--Body-->
+							<div class="modal-body">
+
+								<form action="/user" method="POST" id="reg-form" class="needs-validation" novalidate>
+									<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+									<div class="alert-email-exist alertify-log alertify-log-error alertify-log-show"
+										style="display:none;margin-top:0">
+										[[ #{reg.email.exists} ]]
+									</div>
+
+									<div class="alert-confirmation-failed alertify-log alertify-log-error alertify-log-show"
+										style="display:none;margin-top:0">
+										[[ #{reg.confirm.failed} ]]
+									</div>
+
+									<div class="md-form form-sm">
+										<i class="fas fa-envelope prefix"></i>
+										<input type="email" id="email" name="email" class="form-control form-control-sm"
+											required>
+										<label for="email" class="">[[ #{login.email} ]]</label>
+										<div class="invalid-feedback">
+											[[ #{login.email.invalid} ]]
+										</div>
+									</div>
+
+									<div class="md-form form-sm">
+										<i class="fas fa-lock prefix"></i>
+										<input type="password" id="password" name="password"
+											class="form-control form-control-sm" required>
+										<label for="password" class="">[[ #{login.password} ]]</label>
+										<div class="invalid-feedback">
+											[[ #{login.password.invalid} ]]
+										</div>
+									</div>
+
+									<div class="md-form form-sm">
+										<i class="fas fa-lock prefix"></i>
+										<input type="password" id="matchingPassword" name="matchingPassword"
+											class="form-control form-control-sm" required>
+										<label for="matchingPassword" class="">[[ #{reg.password.confirm} ]]</label>
+										<div class="invalid-feedback">
+											[[ #{reg.password.confirm.entry} ]]
+										</div>
+									</div>
+
+									<div class="md-form form-sm">
+										<i class="fas fa-user-nurse prefix"></i>
+										<input type="text" id="username" name="username"
+											class="form-control form-control-sm" required>
+										<label for="username" class="">[[ #{reg.name} ]]</label>
+										<div class="invalid-feedback">
+											[[ #{reg.name.entry} ]]
+										</div>
+									</div>
+
+									<div class="md-form form-sm">
+										<i class="fas fa-phone prefix"></i>
+										<input type="number" id="tel" name="tel" class="form-control form-control-sm"
+											required>
+										<label for="tel" class="">[[ #{reg.tel} ]]</label>
+										<div class="invalid-feedback">
+											[[ #{reg.tel.entry} ]]
+										</div>
+									</div>
+
+									<div class="text-center form-sm mt-4">
+										<button type="submit" class="btn btn-info waves-effect waves-light">
+											[[ #{reg.signup} ]]
+											<i class="fas fa-sign-in ml-1"></i>
+										</button>
+									</div>
+								</form>
+							</div>
+							<!--Footer-->
+							<div class="modal-footer">
+								<div class="options text-right">
+									<p class="pt-1">[[ #{reg.accepting-all}]]
+										<a href="#" class="blue-text">[[ #{reg.accepting-all-agreements} ]]</a>
+									</p>
+								</div>
+								<button type="button" class="btn btn-outline-info waves-effect ml-auto"
+									data-dismiss="modal">[[ #{close} ]]</button>
+							</div>
+						</div>
+						<!--/.Panel 8-->
+					</div>
+
+				</div>
+			</div>
+			<!--/.Content-->
+		</div>
+	</div>
+	<!-- END Modal: Login / Registration Form-->
+
+	<!-- Central Modal Small -->
+<div class="modal fade" id="centralModalSm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+
+  <!-- Change class .modal-sm to change the size of the modal -->
+  <div class="modal-dialog modal-lg" role="document">
+
+
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title w-100" id="myModalLabel">Modal title</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-sm">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Central Modal Small -->
+
+</header>

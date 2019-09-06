@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{fragment/layout}">
+
+<head>
+	<title>Edit User</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container">
+
+		<div class="jumbotron">
+			<h1>[@{#{edit} + ' ' + #{user}}]] <span th:text="${user.id}"></span></h1>
+			<div class="col-md-6">
+				<form action="/user" id="edit-user-form" method="PUT">
+					<input
+						type="hidden"
+						th:name="${_csrf.parameterName}"
+						th:value="${_csrf.token}" />
+					
+					<input type="hidden" name="userId" class="form-control form-control-sm" th:value="${user.id}">
+
+					<div class="md-form form-sm">
+						<i class="fas fa-envelope prefix"></i>
+						<input type="email" name="email" class="form-control form-control-sm" th:value="${user.email}">
+						<label for="email" class="">[[#{user.email}]]</label>
+					</div>
+
+					<div class="md-form form-sm">
+						<i class="fas fa-user-nurse prefix"></i>
+						<input type="text" name="name" class="form-control form-control-sm" th:value="${user.username}">
+						<label for="name" class="">[[#{user.name}]]</label>
+					</div>
+
+					<div class="md-form form-sm">
+						<i class="fas fa-phone prefix"></i>
+						<input type="number" name="number" class="form-control form-control-sm" th:value="${user.tel}">
+						<label for="number" class="">[[#{user.number}]]</label>
+					</div>
+					
+					<h3>[[#{user.roles}]]</h3>
+					<div class="custom-control custom-checkbox" th:each="role : ${roles}">
+						<input type="checkbox" class="custom-control-input" th:name="${role.name()}" th:id="@{'role-' + ${role.name()}}"
+							th:checked="${#lists.contains(user.authorities, role)}">
+						<label class="custom-control-label" th:for="@{'role-' + ${role.name()}}"><span th:text="${role.name()}"></span></label>
+					</div>
+
+					<div class="text-left form-sm mt-4">
+						<button type="submit" class="btn btn-info waves-effect waves-light">Save
+							<i class="fas fa-sign-in ml-1"></i>
+						</button>
+					</div>
+				</form>
+				</div>
+				
+			
+		</div>
+	</div>
+</body>
+
+</html>

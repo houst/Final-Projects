@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{fragment/layout}">
+
+<head>
+	<title>[[#{seance}]]</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container">
+
+		<div class="jumbotron">
+			<h1>[[ @{${#temporals.format(seanceAtt.startDateTime, "dd MMMM", #locale == new java.util.Locale('ua') ? new java.util.Locale('uk') : #locale)} + ', ' + ${#temporals.format(seanceAtt.startDateTime, 'cccc HH:mm', #locale == new java.util.Locale('ua') ? new java.util.Locale('uk') : #locale)}} ]]</h1>
+			<h2>[[ ${seanceAtt.movie.title} ]]</h2>
+			
+			<form action="/seanse/tickets" id="book-form" method="PUT">
+				<input
+					type="hidden"
+					th:name="${_csrf.parameterName}"
+					th:value="${_csrf.token}" />
+
+				<input
+					type="hidden"
+					name="seanceId"
+					th:value="${seanceAtt.id}" />
+				
+				
+				<h3>[[#{cells}]]</h3>
+				<div class="row ml-1">
+				<div class="custom-control custom-checkbox col-md-2 disable" th:each="ticket : ${seanceAtt.tickets}">
+					<input type="checkbox" class="custom-control-input" th:name="@{'ticket' + ${ticket.id}}" th:id="@{'ticket' + ${ticket.id}}"
+						th:checked="${false}" th:disabled="${ticket.owner == null ? false : true}">
+					<label class="custom-control-label" th:for="@{'ticket' + ${ticket.id}}">[[ @{${ticket.rowNum} + ' ' + #{row} + ' - ' + ${ticket.cellNum}} + ' ' + #{cell} ]]</label>
+				</div>
+				
+				<div sec:authorize="isAuthenticated()" class="text-left form-sm mt-4">
+					<button type="submit" class="btn btn-info waves-effect waves-light">
+						[[#{book}]]
+						<i class="fas fa-sign-in ml-1"></i>
+					</button>
+				</div>
+				
+				<div sec:authorize="isAnonymous()" class="text-left form-sm mt-4">
+					<a data-toggle="modal" data-target="#modalLRFormDemo" class="btn btn-info waves-effect waves-light">
+						[[#{book}]]
+						<i class="fas fa-sign-in ml-1"></i>
+					</a>
+				</div>
+
+				</div>
+			</form>
+			
+		</div>
+	</div>
+</body>
+
+</html>
