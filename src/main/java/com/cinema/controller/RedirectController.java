@@ -1,8 +1,6 @@
 package com.cinema.controller;
 
-import javax.servlet.ServletContext;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,13 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/")
 public class RedirectController {
-
-	@Autowired
-    private ServletContext servletContext;
+	
+	@Value("${locale.default}")
+    private String localeDef;
 	
 	@GetMapping({"/"})
 	public String redirect() {
-		return "redirect:/en" + servletContext.getContextPath();
+		return "redirect:/" + localeDef;
 	}
 	
 }
