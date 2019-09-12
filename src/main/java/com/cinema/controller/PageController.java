@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.cinema.entity.Movie;
-import com.cinema.entity.Role;
 import com.cinema.entity.Seance;
 import com.cinema.entity.User;
 import com.cinema.exception.IdNotFoundException;
@@ -32,16 +31,19 @@ import com.google.common.collect.Multimap;
 public class PageController {
 	
 	@Autowired
-	UserController userController;
+	private UserController userController;
 	
 	@Autowired
-	MovieController movieController;
+	private RoleController roleController;
 	
 	@Autowired
-	SeanceController seanceController;
+	private MovieController movieController;
+	
+	@Autowired
+	private SeanceController seanceController;
 
 	@Autowired
-	TicketController ticketController;
+	private TicketController ticketController;
 	
 	@GetMapping
 	public String index(Model model) {
@@ -99,7 +101,7 @@ public class PageController {
 	{
 		model.addAttribute("user", user.orElseThrow(() -> 
 									new IdNotFoundException("There isn't an user with that id returned from context path")));
-		model.addAttribute("roles", Role.values());
+		model.addAttribute("roles", roleController.getAllRoles());
 		return "user-edit";
 	}
 	

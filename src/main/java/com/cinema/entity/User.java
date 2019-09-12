@@ -7,6 +7,9 @@ import javax.validation.constraints.NotBlank;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +21,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "user")
+@JsonIdentityInfo(
+		generator = ObjectIdGenerators.PropertyGenerator.class,
+		property = "id"
+)
 public class User implements UserDetails {
 	
 	private static final long serialVersionUID = 8454495510704992051L;
@@ -34,9 +41,11 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
     
-    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
-    @Enumerated(EnumType.STRING)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+    		name = "user_role",
+    		joinColumns = { @JoinColumn(name = "user_id") },
+    		inverseJoinColumns = { @JoinColumn(name = "role_id") })
     private List<Role> authorities;
     
     @NotBlank(message = "Name may not be blank")

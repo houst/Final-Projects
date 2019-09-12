@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BillingController {
 	
 	@Autowired
-	TicketController ticketController;
+	private TicketController ticketController;
 	
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/tickets/pay")

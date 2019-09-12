@@ -29,7 +29,7 @@
 							<td class="pt-3-half"><span th:text="${user.email}"></span></td>
 							<td class="pt-3-half"><span th:text="${user.username}"></span></td>
 							<td class="pt-3-half"><span th:text="${user.tel}"></span></td>
-							<td class="pt-3-half"><span th:text="${user.authorities}"></span></td>
+							<td class="pt-3-half"><span th:text="${#strings.listJoin(user.authorities, ', ')}"></span></td>
 							<td>
 								<span class="table-edit"><a th:href="@{'/' + ${#locale} + '/user/' + ${user.id} + '/edit'}"
 										class="btn btn-warning btn-rounded btn-sm my-0">Edit</a></span>
