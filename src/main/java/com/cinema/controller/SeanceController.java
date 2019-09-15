@@ -45,34 +45,29 @@ public class SeanceController {
 	@GetMapping
 	public Page<Seance> getPaginated(
 			@RequestParam Optional<Integer> page,
-			@RequestParam Optional<Integer> size) 
-	{
+			@RequestParam Optional<Integer> size) {
 		return service.findAll(page.orElse(DEFAULT_PAGE_NUMBER) - 1, size.orElse(DEFAULT_PAGE_SIZE));
 	}
 	
+	@PreAuthorize("hasAuthority('ADMIN')")
 	@PostMapping
-	public ResponseEntity<SeanceDto> addNewSeance(
+	public Seance addNewSeance(
 			@Valid SeanceDto seanceDto, 
-			BindingResult result) throws TitleNotFoundException, SeanceBadTimeException, SeanceTimeIsAlreadyTakenException 
-	{	
+			BindingResult result) throws TitleNotFoundException, SeanceBadTimeException, SeanceTimeIsAlreadyTakenException {	
 				
 	    Optional.ofNullable(result.getFieldError()).ifPresent(e -> {throw new ResponseStatusException(HttpStatus.BAD_REQUEST);});
 	    
-	    service.addNewSeance(
+	    return service.addNewSeance(
 	    		seanceDto,
 	    		ticketController.generateEmptyTickets(),
 	    		movieController.getMovieByTitle(seanceDto.getMovieTitle()));
-	    
-	    
-	    return ResponseEntity.ok(seanceDto);
 	}
 	
 	@PreAuthorize("isAuthenticated()")
 	@PutMapping("{seance}/tickets")
-	public ResponseEntity<String> addCurrentUserAsOwnerOfTicketsOfCurrentSeance(
+	public ResponseEntity<String> addChosenTicketsOfCurrentSeanceToCurrentAuthUser(
 			@RequestParam Map<String, String> checkboxes,
-			@RequestParam("seanceId") Seance seance)
-	{	
+			@RequestParam("seanceId") Seance seance) {	
 		List<Ticket> checkedTickets = checkboxes.keySet().stream()
 				.filter(ticket -> ticket.startsWith("ticket"))
 				.map(ticketId -> ticketId.substring(6))
@@ -88,7 +83,7 @@ public class SeanceController {
 		
 		ticketController.addTicketsToCurrentUser(checkedTickets);
 		
-		return new ResponseEntity<>(HttpStatus.OK);
+		return ResponseEntity.ok().build();
 	}
 	
 }
