@@ -1,6 +1,6 @@
 # Cinema
 
-Own realization of **authorization system**.
+Realization of **cinema** with one hall.
 
 ## What is it?
 
@@ -13,7 +13,7 @@ Own realization of **authorization system**.
 
 ## Versioning
 
-For the versions available, see the [tags on this repository](https://github.com/houst/repo/tags). 
+For the versions available, see the [tags on this repository](https://github.com/houst/Cinema-18-Spring/tags). 
 
 ## Authors
 
