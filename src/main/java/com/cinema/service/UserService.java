@@ -50,11 +50,9 @@ public class UserService implements UserDetailsService {
 		return repository.save(user);
 	}
 	
-	public User registerNewUserAccount(@NonNull UserDto userDto, @NonNull Role role) throws EmailExistsException {
+	public User registerNewUserAccount(@NonNull UserDto userDto) throws EmailExistsException {
 		try {
-			User newUser = toUser(userDto);
-			newUser.setAuthorities(ImmutableList.of(role));
-			return repository.save(newUser);
+			return repository.save(toUser(userDto));
 		} catch (Exception e) {
 			throw new EmailExistsException("There is an user with that email adress: " + userDto.getEmail());
 		}
@@ -66,6 +64,7 @@ public class UserService implements UserDetailsService {
 				.password(bcryptPasswordEncoder().encode(userDto.getPassword()))
 				.username(userDto.getUsername())
 				.tel(userDto.getTel())
+				.authorities(ImmutableList.of(Role.USER))
 				.accountNonExpired(true)
 				.accountNonLocked(true)
 				.credentialsNonExpired(true)

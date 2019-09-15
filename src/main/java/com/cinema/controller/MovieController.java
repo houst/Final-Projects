@@ -29,7 +29,7 @@ public class MovieController {
 	private static final int DEFAULT_PAGE_SIZE = 10;
 	
 	@Autowired
-	private MovieService service;
+	MovieService service;
 	
 	@PostMapping
 	public ResponseEntity<String> addNewMovie(
