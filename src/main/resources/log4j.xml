@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration status="debug" name="cinema" packages="">
+	
+	# Console appender
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+        	# Pattern of log message for console appender
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %p %m%n"/>
+        </Console>
+    </Appenders>
+    
+    # File appender
+    <Appenders>
+	    <File name="file" fileName="errors.log" append="true">
+	    	# Pattern of log message for file appender
+	    	<PatternLayout>
+	    		<Pattern>%d{yyyy-MM-dd HH:mm:ss} %p %m%n</Pattern>
+	    	</PatternLayout>
+	    </File>
+	</Appenders>
+    
+    <Root level="ERROR">
+	    <AppenderRef ref="console"/>
+	    <AppenderRef ref="file"/>
+	</Root>
+	
+	<Root level="INFO">
+	    <AppenderRef ref="console" />
+	</Root>
+	
+</Configuration>

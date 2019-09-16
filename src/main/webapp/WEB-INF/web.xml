@@ -1,0 +1,53 @@
+<web-app version="3.0">
+  <display-name>Archetype Created Web Application</display-name>
+  
+  <!-- Dispatcher -->
+  <servlet>
+    <servlet-name>dispatcher</servlet-name>
+    <servlet-class>com.cinema.controller.Servlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>dispatcher</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+  
+  <!-- Resources -->
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/css/*</url-pattern>
+    <url-pattern>/js/*</url-pattern>
+    <url-pattern>/lib/*</url-pattern>
+    <url-pattern>/img/*</url-pattern>
+  </servlet-mapping>
+  
+  <!-- Filters -->
+  <filter>
+    <filter-name>EncodingFilter</filter-name>
+    <filter-class>com.cinema.filter.EncodingFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>EncodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <filter>
+    <filter-name>LocaleSessionFilter</filter-name>
+    <filter-class>com.cinema.filter.LocaleSessionFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>LocaleSessionFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <!-- Listeners -->
+  <listener>
+  	<listener-class>com.cinema.listener.LocaleAppListener</listener-class>
+  </listener>
+
+  <!-- <error-page>
+    <exception-type>java.lang.Exception</exception-type>
+    <location>/WEB-INF/error.jsp</location>
+  </error-page> -->
+
+</web-app>
