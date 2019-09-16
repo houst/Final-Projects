@@ -9,6 +9,7 @@
 <c:set var="locale" value="${sessionScope.locale}" />
 <c:set var="availLanguages" value="${applicationScope.localePrefixes}" />
 
+<c:set var="loggedUser" value="${sessionScope['loggedUser']}" />
 <c:set var="isAuthenticated" value="${sessionScope['isAuthenticated'] == true}" />
 <c:set var="isAnonymous" value="${!sessionScope['isAuthenticated'] == true}" />
 <c:set var="isAdmin" value="${sessionScope['isAdmin'] == true}" />
@@ -52,8 +53,7 @@
 									<a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-4" data-toggle="dropdown"
 										aria-haspopup="true" aria-expanded="false">
 										<i class="fas fa-user"></i>
-										name
-	
+										${loggedUser.getUsername()}
 									</a>
 									<div class="dropdown-menu dropdown-menu-right dropdown-info" aria-labelledby="navbarDropdownMenuLink-4">
 										

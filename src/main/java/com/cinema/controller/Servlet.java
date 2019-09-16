@@ -33,6 +33,7 @@ public class Servlet extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
         commands.put("/logout", new LogoutCommand());
         commands.put("/login", new LoginCommand());
+        commands.put("/user", new UserCommand());
         commands.put("/", new IndexCommand());
         
 		initDb();   
@@ -132,6 +133,20 @@ public class Servlet extends HttpServlet {
         			.credentialsNonExpired(true)
         			.enabled(true)
         			.build());
+			
+			for (int i = 1; i <= 12; i++) {
+				userCommand.addNewUser(User.builder()
+	        			.email("goodman." + i + "@gmail.com")
+	        			.password("1111")
+	        			.authorities(Arrays.asList(Role.USER))
+	        			.username("Man-" + i)
+	        			.tel("+380991122333")
+	        			.accountNonExpired(true)
+	        			.accountNonLocked(true)
+	        			.credentialsNonExpired(true)
+	        			.enabled(true)
+	        			.build());
+			}
 			
 			
 		} catch (Exception e) {

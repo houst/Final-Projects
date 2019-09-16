@@ -1,6 +1,8 @@
 package com.cinema.dao.impl;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.cinema.dao.UserDao;
 import com.cinema.entity.Role;
@@ -16,7 +18,6 @@ public class JdbcUserDao implements UserDao {
 
 	@Override
 	public User findByEmail(String email) throws SQLException {
-		
 		String sql = "SELECT * FROM user WHERE email = ?";
 		
 		User user = null;
@@ -38,10 +39,48 @@ public class JdbcUserDao implements UserDao {
             user.setTickets(new JdbcTicketDao(connection).findByUser(user));
             user.setWatchedMovies(new JdbcMovieDao(connection).findByUser(user));
             
-            connection.close();
         }
 		
 		return user;
+	}
+	
+	@Override
+	public long findCount() throws SQLException {
+		String sql = "SELECT COUNT(*) FROM user";
+		long count = 0;
+		
+		try (PreparedStatement pstmt = connection.prepareStatement(sql);) {
+			
+            try (ResultSet resultSet = pstmt.executeQuery();) {
+                if (resultSet.next()) {
+                	count = resultSet.getLong(1);
+                }
+            }
+            
+        }
+		
+		return count;
+	}
+ 
+	@Override
+	public List<User> findAllUsers(int page, int size) throws SQLException {
+		String sql = "SELECT * FROM user LIMIT ?, ?"; 
+		List<User> users = new ArrayList<>();
+		
+		try (PreparedStatement pstmt = connection.prepareStatement(sql);) {
+			pstmt.setInt(1, (page - 1) * size);
+			pstmt.setInt(2, size);
+            try (ResultSet resultSet = pstmt.executeQuery();) {
+                while (resultSet.next()) {
+                	User user = extractFromResultSet(resultSet);
+                	user.setAuthorities(new JdbcRoleDao(connection).findByUser(user));
+                	users.add(user);
+                }
+            }
+            
+        }
+		
+		return users;
 	}
 	
 	@Override
@@ -75,7 +114,7 @@ public class JdbcUserDao implements UserDao {
             
             if (affectedRowsUser == 0) {
             	connection.rollback();
-            	connection.close();
+//            	connection.close();
                 throw new SQLException("Creating user failed, no rows affected.");
             }
 
@@ -85,7 +124,7 @@ public class JdbcUserDao implements UserDao {
                 }
                 else {
                 	connection.rollback();
-                	connection.close();
+//                	connection.close();
                     throw new SQLException("Creating user failed, no ID obtained.");
                 }
             }
@@ -101,12 +140,12 @@ public class JdbcUserDao implements UserDao {
             	pstmtRole.executeBatch();
             } catch (SQLException e) {
             	connection.rollback();
-            	connection.close();
+//            	connection.close();
             	throw new SQLException("Saving roles failed, no rows affected.");
 			}
             
             connection.commit();
-            connection.close();
+//            connection.close();
             
         }
 		

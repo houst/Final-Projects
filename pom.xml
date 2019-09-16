@@ -46,7 +46,7 @@
 	</dependency>
     
     <!-- Log4J -->
-	<dependency>
+	<!-- <dependency>
 	  <groupId>org.apache.logging.log4j</groupId>
 	  <artifactId>log4j-core</artifactId>
 	  <version>2.12.1</version>
@@ -55,7 +55,7 @@
 	  <groupId>org.apache.logging.log4j</groupId>
 	  <artifactId>log4j-api</artifactId>
 	  <version>2.12.1</version>
-	</dependency>
+	</dependency> -->
     
     <!-- Template Engine -->
     <dependency>
