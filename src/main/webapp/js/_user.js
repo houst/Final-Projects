@@ -15,12 +15,10 @@ jQuery(document).ready(function ($) {
 		var invalidData = form.find(".alertify-log-error");
 		var email = form.find('input[name="email"]');
 		var password = form.find('input[name="password"]');
-		var _csrf = form.find('input[name="_csrf"]');
 
 		var data = {
 			email: email.val(),
 			password: password.val(),
-			_csrf: _csrf.val()
 		};
 
 		$.ajax({
@@ -70,7 +68,6 @@ jQuery(document).ready(function ($) {
 		var matchingPassword = form.find('input[name="matchingPassword"]');
 		var username = form.find('input[name="username"]');
 		var tel = form.find('input[name="tel"]');
-		var _csrf = form.find('input[name="_csrf"]');
 
 		var data = {
 			email: email.val(),
@@ -78,7 +75,6 @@ jQuery(document).ready(function ($) {
 			matchingPassword: matchingPassword.val(),
 			username: username.val(),
 			tel: tel.val(),
-			_csrf: _csrf.val()
 		};
 
 		$.ajax({
@@ -97,7 +93,8 @@ jQuery(document).ready(function ($) {
 		}).fail((response, statusText) => {
 			password.val('');
 			matchingPassword.val('');
-			console.log
+			alertConfirmationFailed.hide();
+			alertEmailExist.hide();
 			if (response.status === 400) {
 				alertConfirmationFailed.show();
 			} else {	
@@ -119,20 +116,17 @@ jQuery(document).ready(function ($) {
 		if (form[0].checkValidity() === false) {
 			return;
 		}
-
 		
-		var userId = form.find('input[name="userId"]')
+		var userId = form.find('input[name="userId"]');
 		var email = form.find('input[name="email"]');
 		var name = form.find('input[name="name"]');
 		var number = form.find('input[name="number"]');
-		var _csrf = form.find('input[name="_csrf"]');
 
 		var data = {
 			userId: userId.val(),
 			email: email.val(),
 			name: name.val(),
 			number: number.val(),
-			_csrf: _csrf.val()
 		};
 
 		form.find('input[type="checkbox"]:checked').each(function() {
@@ -144,7 +138,7 @@ jQuery(document).ready(function ($) {
 			data: data,
 			timeout: 1000,
 			type: 'PUT',
-			url: '/user/' + userId.val(),
+			url: '/user',
 			beforeSend: function () {
 				form.jmspinner();
 			},
@@ -154,7 +148,6 @@ jQuery(document).ready(function ($) {
 		}).done((responseText, statusText, response) => {
 			window.location.href = $.fn.addParameterToUrlIfExist(window.location.href, "updated", "true");
 		}).fail((response, statusText) => {
-			$.fn.sleep(1300); //TODO REMOVE IN PROD
 			//invalidData.show();
 		});
 	});

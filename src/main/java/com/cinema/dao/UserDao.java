@@ -8,14 +8,14 @@ public interface UserDao {
 	
 	User create(User user);
 
+	User findById(long id);
+	
 	User findByEmail(String email);
 
 	List<User> findAllUsers(int page, int size);
 	
 	long findCount();
-    
-//	void update(User user);
-    
-//	void delete(int id);
+
+	User update(User user);
 	
 }

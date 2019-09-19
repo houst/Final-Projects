@@ -38,5 +38,44 @@ public class JdbcRoleDao implements RoleDao {
 		}
 		return roles;
 	}
+
+	@Override
+	public void create(User user) {
+		String insertRole = "INSERT INTO user_role "
+				+ "(user_id, authorities) "
+				+ "values (?, ?)";
+		
+		String truncate = "DELETE FROM user_role "
+				+ "WHERE user_id = ?";
+		
+		try (
+				PreparedStatement pstmtTruncate = connection.prepareStatement(truncate);
+				PreparedStatement pstmtRole = connection.prepareStatement(insertRole);) {
+			
+			pstmtTruncate.setLong(1, user.getId());
+			pstmtTruncate.execute();
+			
+		    for (Role role : user.getAuthorities()) {
+		        pstmtRole.setLong(1, user.getId());
+		        pstmtRole.setString(2, role.getAuthority());
+		        pstmtRole.addBatch();
+		    }
+		    
+		    try {
+		    	pstmtRole.executeBatch();
+		    } catch (SQLException e) {
+		    	throw new SQLException("Saving roles failed, no rows affected.", e);
+			}
+		    
+		    
+		} catch (SQLException e) {
+			throw new RuntimeSQLException(e);
+		}
+	}
+
+	@Override
+	public void update(User user) {
+		create(user);
+	}
 	
 }

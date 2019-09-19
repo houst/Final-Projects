@@ -75,6 +75,42 @@ public class JdbcMovieDao implements MovieDao {
 		return watchedMovies;
 	}
 
+	@Override
+	public User findByTitle(String title) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public User create(Movie newMovie) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Movie> findAll(int page, int size) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public long findCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public Movie findById(int id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Movie update(Movie movie) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	private Movie extractFromResultSet(ResultSet rs) throws SQLException {
         return Movie.builder()
         		.id(rs.getLong("id"))

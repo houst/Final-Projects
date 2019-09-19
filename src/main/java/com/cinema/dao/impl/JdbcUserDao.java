@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.cinema.dao.UserDao;
-import com.cinema.entity.Role;
 import com.cinema.entity.User;
 import com.cinema.exception.RuntimeSQLException;
 
@@ -15,6 +14,39 @@ public class JdbcUserDao implements UserDao {
 	
 	JdbcUserDao(Connection connection) {
 		this.connection = connection;
+	}
+
+	@Override
+	public User findById(long id) {
+		String sql = "SELECT * FROM user WHERE id = ?";
+		
+		User user = null;
+		
+		try (PreparedStatement pstmt = connection.prepareStatement(sql);) {
+			
+			connection.setAutoCommit(false);
+			connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+			
+			pstmt.setLong(1, id);
+            try (ResultSet resultSet = pstmt.executeQuery();) {
+                if (resultSet.next()) {
+                	user = extractFromResultSet(resultSet);
+                }
+            }
+            
+            if (user == null) {
+    			throw new SQLException("There is no user with this id: " + id);
+    		}
+            
+            user.setAuthorities(new JdbcRoleDao(connection).findByUser(user));
+            user.setTickets(new JdbcTicketDao(connection).findByUser(user));
+            user.setWatchedMovies(new JdbcMovieDao(connection).findByUser(user));
+            
+        } catch (SQLException e) {
+			throw new RuntimeSQLException(e);
+		}
+		
+		return user;
 	}
 
 	@Override
@@ -99,18 +131,14 @@ public class JdbcUserDao implements UserDao {
 				+ "(email, password, username, tel, is_account_non_expired, is_account_non_locked, is_credentials_non_expired, is_enabled) "
 				+ "values (?, ?, ?, ?, ?, ?, ?, ?)";
 		
-		String insertRole = "INSERT INTO user_role "
-				+ "(user_id, authorities) "
-				+ "values (?, ?)";
+		
 		
 		try (PreparedStatement pstmtUser = connection.prepareStatement(insertUser, 
-                		Statement.RETURN_GENERATED_KEYS);
-				PreparedStatement pstmtRole = connection.prepareStatement(insertRole);) {
+                		Statement.RETURN_GENERATED_KEYS);) {
 			
 			connection.setAutoCommit(false);
 			connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 			
-			// Save user
 			pstmtUser.setString(1, user.getEmail());
 			pstmtUser.setString(2, user.getPassword());
 			pstmtUser.setString(3, user.getUsername());
@@ -137,18 +165,11 @@ public class JdbcUserDao implements UserDao {
                 }
             }
             
-            // Save roles
-            for (Role role : user.getAuthorities()) {
-	            pstmtRole.setLong(1, user.getId());
-	            pstmtRole.setString(2, role.getAuthority());
-	            pstmtRole.addBatch();
-            }
-            
             try {
-            	pstmtRole.executeBatch();
-            } catch (SQLException e) {
+            	new JdbcRoleDao(connection).create(user);
+            } catch (RuntimeSQLException e) {
             	connection.rollback();
-            	throw new SQLException("Saving roles failed, no rows affected.");
+				throw new SQLException("Creating roles failed, no rows affected", e);
 			}
             
             connection.commit();
@@ -161,25 +182,38 @@ public class JdbcUserDao implements UserDao {
 		
 	}
 	
-	//update
-//	try (BasicDataSource dataSource = DataBaseUtility.getDataSource(); 
-//            Connection connection = dataSource.getConnection();
-//            PreparedStatement pstmt = connection.prepareStatement("SELECT * FROM account");)
-//    {
-//System.out.println("The Connection Object is of Class: "+connection.getClass());
-//        try (ResultSet resultSet = pstmt.executeQuery();)
-//        {
-//            while (resultSet.next())
-//            {
-//                System.out.println(resultSet.getString(1) + "," + resultSet.getString(2) + "," + resultSet.getString(3));
-//            }
-//        }
-//        catch (Exception e)
-//        {
-//            connection.rollback();
-//            e.printStackTrace();
-//        }
-//    }
+	public User update(User user) {
+		String sql = "UPDATE user SET "
+				+ "email = ?, username = ?, tel = ? "
+				+ "WHERE id = ?";
+		
+		try (PreparedStatement pstmt = connection.prepareStatement(sql);) {
+			
+			connection.setAutoCommit(false);
+			connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+			
+			pstmt.setString(1, user.getEmail());
+			pstmt.setString(2, user.getUsername());
+			pstmt.setString(3, user.getTel());
+			pstmt.setLong(4, user.getId());
+			pstmt.execute();
+            
+			try {
+            	new JdbcRoleDao(connection).update(user);
+            } catch (RuntimeSQLException e) {
+            	connection.rollback();
+				throw new SQLException("Creating roles failed, no rows affected", e);
+			}
+            
+            connection.commit();
+			
+        } catch (SQLException e) {
+        	e.printStackTrace();
+        	throw new RuntimeSQLException(e);
+		}
+		
+		return findById(user.getId());
+	}
 	
 	private User extractFromResultSet(ResultSet rs) throws SQLException{
         return User.builder()

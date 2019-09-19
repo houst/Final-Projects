@@ -7,7 +7,7 @@ public class ErrorCommand implements Command {
 
 	@Override
 	public String execute(HttpServletRequest request) {
-		return CommandUtility.generateError(HttpServletResponse.SC_NOT_FOUND);
+		return CommandUtility.error(HttpServletResponse.SC_NOT_FOUND);
 	}
 
 }

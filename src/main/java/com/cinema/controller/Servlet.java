@@ -22,6 +22,7 @@ import com.cinema.config.AppConfig;
 import com.cinema.controller.command.*;
 import com.cinema.entity.Role;
 import com.cinema.entity.User;
+import com.cinema.service.UserService;
 import com.cinema.util.DBConnectionPoolHolder;
 
 
@@ -67,20 +68,17 @@ public class Servlet extends HttpServlet {
 	private void processRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String path = req.getRequestURI();
 		
-		path = path.length() > 3 && AppConfig.LOCALE_PREFIXES.contains(path.split("/")[1]) ? path.substring(3) :
+		path = path.length() > 3 && AppConfig.LOCALE_PREFIXES.contains(path.split("/")[1]) ? "/".concat(path.split("/")[2]) :
 			path.length() == 3 && AppConfig.LOCALE_PREFIXES.contains(path.substring(1)) ? "/" : path;
+		log.debug("IN processRequest() - requestURI after processing: \"{}\"", path);
 		
-		req.setAttribute("path", path); // Solving problem with not working 'request.getContextPath()' in JSPs
-		
-		log.info("IN Servlet :: processRequest() - requestURI after processing: \"{}\"", path);
+		req.setAttribute("path", path);
 		
         Command command = commands.getOrDefault(path, request -> "/error");
-        
-        log.info("IN Servlet :: processRequest() - process command: {}", command.getClass().getSimpleName());
+        log.debug("IN processRequest() - process command: {}", command.getClass().getSimpleName());
         
         String result = command.execute(req);
-        
-        log.info("IN Servlet :: processRequest() - result of processed command: \"{}\"", result);
+        log.debug("IN processRequest() - result of processed command: \"{}\"", result);
         
         if (result.startsWith("error")) {
         	resp.sendError(Integer.parseInt(result.substring(6)));
@@ -126,8 +124,8 @@ public class Servlet extends HttpServlet {
 			
 			
 			// Add Users
-			UserCommand userCommand = new UserCommand();
-			userCommand.addNewUser(User.builder()
+			UserService userService = new UserService();
+			userService.create(User.builder()
         			.email("cinema2019@gmail.com")
         			.password("1111")
         			.authorities(Arrays.asList(Role.ADMIN, Role.USER))
@@ -140,7 +138,7 @@ public class Servlet extends HttpServlet {
         			.build());
 			
 			for (int i = 1; i <= 12; i++) {
-				userCommand.addNewUser(User.builder()
+				userService.create(User.builder()
 	        			.email("goodman." + i + "@gmail.com")
 	        			.password("1111")
 	        			.authorities(Arrays.asList(Role.USER))

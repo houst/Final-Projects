@@ -9,4 +9,8 @@ public interface RoleDao {
 	
 	List<Role> findByUser(User user);
 	
+	void create(User user);
+	
+	void update(User user);
+	
 }

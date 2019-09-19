@@ -8,6 +8,8 @@ import com.cinema.dao.UserDao;
 import com.cinema.entity.User;
 import com.cinema.exception.EmailExistsException;
 import com.cinema.exception.EmailNotFoundException;
+import com.cinema.exception.IdNotFoundException;
+import com.cinema.exception.RuntimeSQLException;
 
 public class UserService {
 	
@@ -29,7 +31,7 @@ public class UserService {
 		}
 	}
 
-	public List<User> findAllUsers(int page, int size) {
+	public List<User> findAll(int page, int size) {
 		try {
 			return repo.findAllUsers(page, size); 
 		} catch (RuntimeException e) {
@@ -42,6 +44,22 @@ public class UserService {
 			return repo.findCount();
 		} catch (RuntimeException e) {
 			return 0;
+		}
+	}
+
+	public User findById(int id) throws IdNotFoundException {
+		try {
+			return repo.findById(id);
+		} catch (RuntimeSQLException e) {
+			throw new IdNotFoundException("There is no user with this id: " + id);
+		}
+	}
+
+	public User update(User user) throws IdNotFoundException {
+		try {
+			return repo.update(user);
+		} catch (RuntimeSQLException e) {
+			throw new IdNotFoundException("Thre is no user for updating with this id: " + user.getId());
 		}
 	}
 	

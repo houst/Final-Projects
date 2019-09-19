@@ -1,13 +1,19 @@
 package com.cinema.controller.command;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.cinema.dto.UserDto;
+import com.cinema.entity.Role;
 import com.cinema.entity.User;
 import com.cinema.exception.EmailExistsException;
-import com.cinema.exception.EmailNotFoundException;
+import com.cinema.exception.IdNotFoundException;
 import com.cinema.service.UserService;
 
 public class UserCommand implements Command {
@@ -37,30 +43,45 @@ public class UserCommand implements Command {
 			return doDelete(request);
 		}
 		
-		return CommandUtility.generateError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-	}
-	
-	public User addNewUser(User newUser) throws EmailExistsException {
-		return service.create(newUser);
-	}
-	
-	public User getUserByEmail(String email) throws EmailNotFoundException {
-		return service.findByEmail(email);
-	}
-	
-	public List<User> getAllUsersPaginated(int page, int size) {
-		return service.findAllUsers(page, size);
-	}
-	
-	public long getUsersCount() {
-		return service.findCount();
+		return CommandUtility.error(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 	}
 	
 	private String doGet(HttpServletRequest request) {
 		if (!CommandUtility.checkUserIsGranted(request)) {
-			return CommandUtility.generateError(HttpServletResponse.SC_NOT_FOUND);
+			return CommandUtility.error(HttpServletResponse.SC_NOT_FOUND);
 		}
 		
+		String path = request.getRequestURI();
+		String regexUserList = ".*/user/?$";
+		String regexUserEdit = ".*/[0-9]+/edit/?$";
+		
+		if (path.matches(regexUserEdit)) {
+			return doGetUserEditPage(request);
+		}
+		
+		if (path.matches(regexUserList)) {
+			return doGetUserListPage(request);
+		}
+		
+		return CommandUtility.error(HttpServletResponse.SC_NOT_FOUND);
+	}
+	
+	private String doGetUserEditPage(HttpServletRequest request) {
+		int userIdFromPath = Integer.parseInt(request.getRequestURI().split("/")[3]);
+		User user = null;
+		try {
+			user = service.findById(userIdFromPath);
+		} catch (IdNotFoundException e) {
+			return CommandUtility.error(HttpServletResponse.SC_NOT_FOUND);
+		}
+		
+		request.setAttribute("user", user);
+		request.setAttribute("roles", Role.values());
+		
+		return "/WEB-INF/user-edit.jsp";
+	}
+	
+	private String doGetUserListPage(HttpServletRequest request) {
 		Integer page = null;
 		Integer size = null;
 
@@ -76,8 +97,8 @@ public class UserCommand implements Command {
 			size = DEFAULT_SIZE;
 		}
 		
-		long elementsCount = getUsersCount();
-		request.setAttribute("elements", getAllUsersPaginated(page, size));
+		long elementsCount = service.findCount();
+		request.setAttribute("elements", service.findAll(page, size));
 		request.setAttribute("elementsCount", elementsCount);
 		request.setAttribute("page", page);
 		request.setAttribute("size", size);
@@ -87,15 +108,86 @@ public class UserCommand implements Command {
 	}
 	
 	private String doPost(HttpServletRequest request) {
-		return CommandUtility.generateError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+		
+		UserDto userDto = UserDto.builder()
+				.email(request.getParameter("email"))
+				.password(request.getParameter("password"))
+				.matchingPassword(request.getParameter("matchingPassword"))
+				.username(request.getParameter("username"))
+				.tel(request.getParameter("tel"))
+				.build();
+		
+		if (userDto.getPassword() == null ||
+				!userDto.getPassword().equals(userDto.getMatchingPassword()) ||
+				!userDto.getEmail().matches(RegExConsts.REGEX_EMAIL) ||
+				!userDto.getUsername().matches(RegExConsts.REGEX_NAME)) {
+			
+			return CommandUtility.error(HttpServletResponse.SC_BAD_REQUEST);
+		}
+		
+		try {
+			service.create(convertToEntity(userDto));
+		} catch (EmailExistsException e) {
+			return CommandUtility.error(HttpServletResponse.SC_CONFLICT);
+		}
+		
+		return CommandUtility.json("{ \"created\" : true}");
 	}
 	
 	private String doPut(HttpServletRequest request) {
-		return CommandUtility.generateError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+		Map<String, String> data = CommandUtility.getParameterMap(request);
+		User user = User.builder()
+				.id(Long.parseLong(CommandUtility.decodeValue(data.get("userId"))))
+				.email(CommandUtility.decodeValue(data.get("email")))
+				.username(CommandUtility.decodeValue(data.get("name")))
+				.tel(CommandUtility.decodeValue(data.get("number")))
+				.build();
+		
+		Set<String> roles = Arrays.stream(Role.values())
+				.map(Role::name).collect(Collectors.toSet());
+		
+		user.setAuthorities(new ArrayList<Role>());
+		
+		for (String key : data.keySet()) {
+			if (roles.contains(key)) {
+				user.getAuthorities().add(Role.valueOf(key));
+			}
+		}
+		
+		try {
+			service.update(user);
+		} catch (IdNotFoundException e) {
+			CommandUtility.error(HttpServletResponse.SC_NOT_FOUND);
+		}
+		return CommandUtility.json("{ \"updated\" : true}");
 	}
 	
 	private String doDelete(HttpServletRequest request) {
-		return CommandUtility.generateError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+		return CommandUtility.error(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+	}
+	
+//	private UserDto convertToDto(User user) {
+//		return UserDto.builder()
+//				.email(user.getEmail())
+//				.password(user.getPassword())
+//				.matchingPassword(user.getPassword())
+//				.username(user.getUsername())
+//				.tel(user.getTel())
+//				.build();
+//	}
+	
+	private User convertToEntity(UserDto userDto) {
+		return User.builder()
+    			.email(userDto.getEmail())
+    			.password(userDto.getPassword())
+    			.authorities(Arrays.asList(Role.USER))
+    			.username(userDto.getUsername())
+    			.tel(userDto.getTel())
+    			.accountNonExpired(true)
+    			.accountNonLocked(true)
+    			.credentialsNonExpired(true)
+    			.enabled(true)
+    			.build();
 	}
 	
 }

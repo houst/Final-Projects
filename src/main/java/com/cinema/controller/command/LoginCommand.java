@@ -7,10 +7,11 @@ import javax.servlet.http.HttpSession;
 import com.cinema.entity.Role;
 import com.cinema.entity.User;
 import com.cinema.exception.EmailNotFoundException;
+import com.cinema.service.UserService;
 
 public class LoginCommand implements Command {
 	
-	private UserCommand userCommand = new UserCommand();
+	private UserService userService = new UserService();
 	
 	@Override
 	public String execute(HttpServletRequest request) {
@@ -21,20 +22,20 @@ public class LoginCommand implements Command {
 			final String password = request.getParameter("password");
 			
 			if( email == null || email.equals("") || password == null || password.equals("")  ){
-				return CommandUtility.generateError(HttpServletResponse.SC_BAD_REQUEST);
+				return CommandUtility.error(HttpServletResponse.SC_BAD_REQUEST);
 	        }
 			
 			User loggedUser = null;
 			try {
-				loggedUser = userCommand.getUserByEmail(email);
+				loggedUser = userService.findByEmail(email);
 			} catch (EmailNotFoundException e) {
-				return CommandUtility.generateError(HttpServletResponse.SC_BAD_REQUEST); 
+				return CommandUtility.error(HttpServletResponse.SC_BAD_REQUEST); 
 			}
 			
 			final boolean isAuthenticated = password.equals(loggedUser.getPassword());
 			
 			if (!isAuthenticated) {
-				return CommandUtility.generateError(HttpServletResponse.SC_BAD_REQUEST);
+				return CommandUtility.error(HttpServletResponse.SC_BAD_REQUEST);
 			}
 
 			final boolean isAdmin = loggedUser.getAuthorities().stream().anyMatch(role -> role.equals(Role.ADMIN));
@@ -45,10 +46,10 @@ public class LoginCommand implements Command {
 			session.setAttribute("isAdmin", isAdmin);
 			
 			
-			return "json:{\"loggedUser\" : true}";
+			return CommandUtility.json("{\"loggedUser\" : true}");
 		}
 		
-		return CommandUtility.generateError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+		return CommandUtility.error(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 	}
 
 }

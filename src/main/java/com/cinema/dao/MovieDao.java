@@ -11,5 +11,17 @@ public interface MovieDao {
 	Movie findBySeance(Seance seance);
 	
 	List<Movie> findByUser(User user);
+
+	User findByTitle(String title);
+
+	User create(Movie newMovie);
+
+	List<Movie> findAll(int page, int size);
+
+	long findCount();
+
+	Movie findById(int id);
+
+	Movie update(Movie movie);
 	
 }
