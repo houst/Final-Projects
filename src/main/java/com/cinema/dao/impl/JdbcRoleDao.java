@@ -10,6 +10,7 @@ import java.util.List;
 import com.cinema.dao.RoleDao;
 import com.cinema.entity.Role;
 import com.cinema.entity.User;
+import com.cinema.exception.RuntimeSQLException;
 
 public class JdbcRoleDao implements RoleDao {
 	
@@ -20,7 +21,7 @@ public class JdbcRoleDao implements RoleDao {
 	}
 
 	@Override
-	public List<Role> findByUser(User user) throws SQLException {
+	public List<Role> findByUser(User user) {
 		
 		String sql = "SELECT authorities FROM user_role WHERE user_id = ?";
 		
@@ -32,7 +33,9 @@ public class JdbcRoleDao implements RoleDao {
                 	roles.add(Role.valueOf(resultSet.getString(1)));
                 }
             }
-        }
+        } catch (SQLException e) {
+			throw new RuntimeSQLException(e);
+		}
 		return roles;
 	}
 	

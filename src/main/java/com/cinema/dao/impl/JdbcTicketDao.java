@@ -11,6 +11,7 @@ import com.cinema.dao.SeanceDao;
 import com.cinema.dao.TicketDao;
 import com.cinema.entity.Ticket;
 import com.cinema.entity.User;
+import com.cinema.exception.RuntimeSQLException;
 
 public class JdbcTicketDao implements TicketDao {
 
@@ -21,7 +22,7 @@ public class JdbcTicketDao implements TicketDao {
 	}
 
 	@Override
-	public List<Ticket> findByUser(User user) throws SQLException {
+	public List<Ticket> findByUser(User user) {
 		
 		String sql = "SELECT * FROM ticket WHERE user_id = ?";
 		
@@ -35,7 +36,9 @@ public class JdbcTicketDao implements TicketDao {
                 	tickets.add(ticket);
                 }
             }
-        }
+        } catch (SQLException e) {
+			throw new RuntimeSQLException(e);
+		}
 		
 		SeanceDao seanceDao = new JdbcSeanceDao(connection);
 		for (Ticket ticket : tickets) {
@@ -60,7 +63,7 @@ public class JdbcTicketDao implements TicketDao {
         try {
             connection.close();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeSQLException(e);
         }
     }
 	

@@ -4,15 +4,15 @@ import org.apache.commons.dbcp2.BasicDataSource;
 
 import com.cinema.config.AppConfig;
 
-public class DataBaseUtil {
+public class DBConnectionPoolHolder {
 	
 	private static BasicDataSource dataSource;
 	
-	private DataBaseUtil() {}
+	private DBConnectionPoolHolder() {}
 	 
-    public static BasicDataSource getDataSource() {
- 
-        if (dataSource == null) {
+    public static synchronized BasicDataSource getDataSource() {
+    	
+       if (dataSource == null) {
             BasicDataSource ds = new BasicDataSource();
             ds.setUrl(AppConfig.DB_URL);
             ds.setUsername(AppConfig.DB_USERNAME);
@@ -24,6 +24,7 @@ public class DataBaseUtil {
  
             dataSource = ds;
         }
+
         return dataSource;
     }
     

@@ -7,6 +7,7 @@ import java.util.List;
 import com.cinema.dao.UserDao;
 import com.cinema.entity.Role;
 import com.cinema.entity.User;
+import com.cinema.exception.RuntimeSQLException;
 
 public class JdbcUserDao implements UserDao {
 	
@@ -17,12 +18,15 @@ public class JdbcUserDao implements UserDao {
 	}
 
 	@Override
-	public User findByEmail(String email) throws SQLException {
+	public User findByEmail(String email) {
 		String sql = "SELECT * FROM user WHERE email = ?";
 		
 		User user = null;
 		
 		try (PreparedStatement pstmt = connection.prepareStatement(sql);) {
+			
+			connection.setAutoCommit(false);
+			connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
 			
 			pstmt.setString(1, email);
             try (ResultSet resultSet = pstmt.executeQuery();) {
@@ -39,13 +43,15 @@ public class JdbcUserDao implements UserDao {
             user.setTickets(new JdbcTicketDao(connection).findByUser(user));
             user.setWatchedMovies(new JdbcMovieDao(connection).findByUser(user));
             
-        }
+        } catch (SQLException e) {
+			throw new RuntimeSQLException(e);
+		}
 		
 		return user;
 	}
 	
 	@Override
-	public long findCount() throws SQLException {
+	public long findCount() {
 		String sql = "SELECT COUNT(*) FROM user";
 		long count = 0;
 		
@@ -57,13 +63,15 @@ public class JdbcUserDao implements UserDao {
                 }
             }
             
-        }
+        } catch (SQLException e) {
+			throw new RuntimeSQLException(e);
+		}
 		
 		return count;
 	}
  
 	@Override
-	public List<User> findAllUsers(int page, int size) throws SQLException {
+	public List<User> findAllUsers(int page, int size) {
 		String sql = "SELECT * FROM user LIMIT ?, ?"; 
 		List<User> users = new ArrayList<>();
 		
@@ -78,13 +86,15 @@ public class JdbcUserDao implements UserDao {
                 }
             }
             
-        }
+        } catch (SQLException e) {
+        	throw new RuntimeSQLException(e);
+		}
 		
 		return users;
 	}
 	
 	@Override
-	public User create(User user) throws SQLException {
+	public User create(User user) {
 		String insertUser = "INSERT INTO user "
 				+ "(email, password, username, tel, is_account_non_expired, is_account_non_locked, is_credentials_non_expired, is_enabled) "
 				+ "values (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -114,7 +124,6 @@ public class JdbcUserDao implements UserDao {
             
             if (affectedRowsUser == 0) {
             	connection.rollback();
-//            	connection.close();
                 throw new SQLException("Creating user failed, no rows affected.");
             }
 
@@ -124,7 +133,6 @@ public class JdbcUserDao implements UserDao {
                 }
                 else {
                 	connection.rollback();
-//                	connection.close();
                     throw new SQLException("Creating user failed, no ID obtained.");
                 }
             }
@@ -140,14 +148,14 @@ public class JdbcUserDao implements UserDao {
             	pstmtRole.executeBatch();
             } catch (SQLException e) {
             	connection.rollback();
-//            	connection.close();
             	throw new SQLException("Saving roles failed, no rows affected.");
 			}
             
             connection.commit();
-//            connection.close();
             
-        }
+        } catch (SQLException e) {
+			throw new RuntimeSQLException(e);
+		}
 		
 		return user;
 		
@@ -187,12 +195,12 @@ public class JdbcUserDao implements UserDao {
     			.build();
     }
 	
-	public void close()  {
+	public void close() {
         try {
-            connection.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+			connection.close();
+		} catch (SQLException e) {
+			throw new RuntimeSQLException(e);
+		}
     }
 
 }

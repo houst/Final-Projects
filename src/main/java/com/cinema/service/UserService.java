@@ -1,15 +1,13 @@
 package com.cinema.service;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.cinema.dao.DaoFactory;
 import com.cinema.dao.UserDao;
 import com.cinema.entity.User;
-
-import exception.EmailExistsException;
-import exception.EmailNotFoundException;
+import com.cinema.exception.EmailExistsException;
+import com.cinema.exception.EmailNotFoundException;
 
 public class UserService {
 	
@@ -18,7 +16,7 @@ public class UserService {
 	public User findByEmail(String email) throws EmailNotFoundException {
 		try {
 			return repo.findByEmail(email);
-		} catch (SQLException e) {
+		} catch (RuntimeException e) {
 			throw new EmailNotFoundException("There is no user with this email: " + email);
 		}
 	}
@@ -26,15 +24,15 @@ public class UserService {
 	public User create(User newUser) throws EmailExistsException {
 		try {
 			return repo.create(newUser);
-		} catch (SQLException e) {
+		} catch (RuntimeException e) {
 			throw new EmailExistsException("There is already exists user with this email: " + newUser.getEmail());
 		}
 	}
 
 	public List<User> findAllUsers(int page, int size) {
 		try {
-			return repo.findAllUsers(page, size);
-		} catch (SQLException e) {
+			return repo.findAllUsers(page, size); 
+		} catch (RuntimeException e) {
 			return new ArrayList<>();
 		}
 	}
@@ -42,7 +40,7 @@ public class UserService {
 	public long findCount() {
 		try {
 			return repo.findCount();
-		} catch (SQLException e) {
+		} catch (RuntimeException e) {
 			return 0;
 		}
 	}

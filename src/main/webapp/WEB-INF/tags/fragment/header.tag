@@ -22,7 +22,7 @@
 
 				<!-- Navbar -->
 				<nav class="mb-3 navbar navbar-expand-lg navbar-dark info-color">
-					<a class="navbar-brand" href="/">CINEMA</a>
+					<a class="navbar-brand" href="/${locale}">CINEMA</a>
 					<button class="navbar-toggler" type="button" data-toggle="collapse"
 						data-target="#navbarSupportedContent-4" aria-controls="navbarSupportedContent-4"
 						aria-expanded="false" aria-label="Toggle navigation">
@@ -65,13 +65,13 @@
 											<h6 class="dropdown-header">
 												<fmt:message key="admin.panel"/>
 											</h6>
-											<a class="dropdown-item" href="/${locale}/users">
+											<a class="dropdown-item" href="/${locale}/user">
 												<fmt:message key="user.list"/>
 											</a>
-											<a class="dropdown-item" href="/${locale}/movies">
+											<a class="dropdown-item" href="/${locale}/movie">
 												<fmt:message key="movie.list"/>
 											</a>
-											<a class="dropdown-item" href="/${locale}/seances">
+											<a class="dropdown-item" href="/${locale}/seance">
 												<fmt:message key="seance.list"/>
 											</a>
 										</c:if>
@@ -90,7 +90,7 @@
 								</a>
 								<div class="dropdown-menu dropdown-menu-right dropdown-info" aria-labelledby="navbarDropdownMenuLink-5">
 									<c:forEach items="${availLanguages.split(',')}" var="prefix">
-									    <a class="dropdown-item" href="/${prefix}${pageContext.request.contextPath}">
+									    <a class="dropdown-item" href="/${prefix}${path == '/' ? '' : path}${pageContext.request.queryString != '' && pageContext.request.queryString != null ? '?'.concat(pageContext.request.queryString) : ''}">
 											<img class="flag" src="/img/flags/${prefix}.png" alt="${fn:toUpperCase(prefix)}">
 											${fn:toUpperCase(prefix)}
 										</a>

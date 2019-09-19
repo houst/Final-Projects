@@ -1,4 +1,8 @@
-<web-app version="3.0">
+<web-app 
+		xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+		version="4.0">
   <display-name>Archetype Created Web Application</display-name>
   
   <!-- Dispatcher -->
@@ -45,9 +49,17 @@
   	<listener-class>com.cinema.listener.LocaleAppListener</listener-class>
   </listener>
 
-  <!-- <error-page>
-    <exception-type>java.lang.Exception</exception-type>
+  <!-- Error pages -->
+  <error-page>
     <location>/WEB-INF/error.jsp</location>
-  </error-page> -->
+  </error-page>
+  <error-page>
+    <error-code>401</error-code>
+    <location>/WEB-INF/error/401.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>404</error-code>
+    <location>/WEB-INF/error/404.jsp</location>
+  </error-page>
 
 </web-app>

@@ -1,19 +1,18 @@
 package com.cinema.dao;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import com.cinema.entity.User;
 
 public interface UserDao {
 	
-	User create(User user) throws SQLException;
+	User create(User user);
 
-	User findByEmail(String email) throws SQLException;
+	User findByEmail(String email);
 
-	List<User> findAllUsers(int page, int size) throws SQLException;
+	List<User> findAllUsers(int page, int size);
 	
-	long findCount() throws SQLException;
+	long findCount();
     
 //	void update(User user);
     

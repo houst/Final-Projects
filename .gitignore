@@ -24,7 +24,11 @@
 # Windows
 [Dd]esktop.ini
 $RECYCLE.BIN/
- 
+
+# Logs
+*.log
+*.logs
+
 # Maven
 log/
 target/

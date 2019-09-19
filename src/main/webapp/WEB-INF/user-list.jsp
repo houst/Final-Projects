@@ -17,37 +17,35 @@
 
 	<div class="jumbotron">
 		<h1><fmt:message key="user.list"/></h1>
-		<p>
-			<table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
-				<thead>
-					<tr>
-						<th class="text-center"><fmt:message key="user.email"/></th>
-						<th class="text-center"><fmt:message key="user.name"/></th>
-						<th class="text-center"><fmt:message key="user.number"/></th>
-						<th class="text-center"><fmt:message key="user.roles"/></th>
-						<th class="text-center"><fmt:message key="actions"/></th>
-					</tr>
-				</thead>
-				<tbody>
-				<c:forEach var="el" items="${elements}">
-					<tr>
-						<td class="pt-3-half">${ el.email }</td>
-						<td class="pt-3-half">${ el.username }</td>
-						<td class="pt-3-half">${ el.tel }</td>
-						<td class="pt-3-half">${ el.authorities }</td>
-						<td>
-							<span class="table-edit">
-								<a th:href="/${locale}/user/${el.id}/edit"
-									class="btn btn-outline-warning btn-rounded btn-sm px-2 waves-effect waves-light">
-									<i class="fas fa-pencil-alt mt-0"></i>
-								</a>
-							</span>
-						</td>
-					</tr>
-				</c:forEach>
-				</tbody>
-			</table>
-		</p>
+		<table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+			<thead>
+				<tr>
+					<th class="text-center"><fmt:message key="user.email"/></th>
+					<th class="text-center"><fmt:message key="user.name"/></th>
+					<th class="text-center"><fmt:message key="user.number"/></th>
+					<th class="text-center"><fmt:message key="user.roles"/></th>
+					<th class="text-center"><fmt:message key="actions"/></th>
+				</tr>
+			</thead>
+			<tbody>
+			<c:forEach var="el" items="${elements}">
+				<tr>
+					<td class="pt-3-half">${ el.email }</td>
+					<td class="pt-3-half">${ el.username }</td>
+					<td class="pt-3-half">${ el.tel }</td>
+					<td class="pt-3-half">${ el.authorities }</td>
+					<td>
+						<span class="table-edit">
+							<a href="/${locale}/user/${el.id}/edit"
+								class="btn btn-outline-warning btn-rounded btn-sm px-2 waves-effect waves-light">
+								<i class="fas fa-pencil-alt mt-0"></i>
+							</a>
+						</span>
+					</td>
+				</tr>
+			</c:forEach>
+			</tbody>
+		</table>
 		<div class="row">
 			<div class="col-sm-12 col-md-5">
 				<div class="dataTables_info">

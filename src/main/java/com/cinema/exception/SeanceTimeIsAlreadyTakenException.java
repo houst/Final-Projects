@@ -1,4 +1,4 @@
-package exception;
+package com.cinema.exception;
 
 public class SeanceTimeIsAlreadyTakenException extends Exception {
 

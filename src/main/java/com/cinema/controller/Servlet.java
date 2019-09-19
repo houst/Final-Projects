@@ -15,22 +15,27 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.cinema.config.AppConfig;
 import com.cinema.controller.command.*;
 import com.cinema.entity.Role;
 import com.cinema.entity.User;
-import com.cinema.util.DataBaseUtil;
+import com.cinema.util.DBConnectionPoolHolder;
 
 
 public class Servlet extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	
+	private static Logger log = LoggerFactory.getLogger(Servlet.class);
+	
 	private Map<String, Command> commands = new HashMap<>();
 	
 	@Override
 	public void init(ServletConfig config) throws ServletException {
+		commands.put("/error", new ErrorCommand());
         commands.put("/logout", new LogoutCommand());
         commands.put("/login", new LoginCommand());
         commands.put("/user", new UserCommand());
@@ -62,29 +67,29 @@ public class Servlet extends HttpServlet {
 	private void processRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String path = req.getRequestURI();
 		
-		path = path.length() > 3 && AppConfig.LOCALE_PREFIXES.contains(path.split("/")[1]) ? path.substring(3) : path;
-		System.out.println(path);
-        Command command = commands.getOrDefault(path, request -> "/");
+		path = path.length() > 3 && AppConfig.LOCALE_PREFIXES.contains(path.split("/")[1]) ? path.substring(3) :
+			path.length() == 3 && AppConfig.LOCALE_PREFIXES.contains(path.substring(1)) ? "/" : path;
+		
+		req.setAttribute("path", path); // Solving problem with not working 'request.getContextPath()' in JSPs
+		
+		log.info("IN Servlet :: processRequest() - requestURI after processing: \"{}\"", path);
+		
+        Command command = commands.getOrDefault(path, request -> "/error");
         
-        System.out.println(command.getClass().getName());
+        log.info("IN Servlet :: processRequest() - process command: {}", command.getClass().getSimpleName());
         
         String result = command.execute(req);
         
+        log.info("IN Servlet :: processRequest() - result of processed command: \"{}\"", result);
+        
         if (result.startsWith("error")) {
-        	
         	resp.sendError(Integer.parseInt(result.substring(6)));
-        	
         } else if (result.startsWith("json")) {
-        	
         	resp.setContentType("application/json");
         	resp.getWriter().write(result.substring(5));
-        
         } else if (result.startsWith("redirect")) {
-        	
         	resp.sendRedirect(result.substring(9));
-        	
         } else {
-        	
         	req.getRequestDispatcher(result).forward(req,resp);
         }
 	}
@@ -103,7 +108,7 @@ public class Servlet extends HttpServlet {
 			String sql4 = "DELETE FROM user";
 			String sql5 = "DELETE FROM seance";
 			String sql6 = "DELETE FROM movie";
-			BasicDataSource dataSource = DataBaseUtil.getDataSource();
+			BasicDataSource dataSource = DBConnectionPoolHolder.getDataSource();
 			try ( Connection connection = dataSource.getConnection();
 	                PreparedStatement pstmt1 = connection.prepareStatement(sql1);
 					PreparedStatement pstmt2 = connection.prepareStatement(sql2);

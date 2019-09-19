@@ -10,14 +10,22 @@
 <c:set var="locale" value="${sessionScope.locale}" />
 
 <f:layout>
-<jsp:attribute name="title">Main page</jsp:attribute> 
+<jsp:attribute name="title">Error 404</jsp:attribute> 
 <jsp:attribute name="content">
 
-<section class="container">
-  <div class="jumbotron mb-3">
-    <h1>Hello from Layout</h1>
-  </div>
-</section>
+	<section class="container">
 
+		<div class="jumbotron mb-3">
+			<h1><i class="far fa-frown"></i> <fmt:message key="error.code404.title" /></h1>
+			<p>
+				<fmt:message key="error.code404.description" /></p>
+			<p>
+				<a class="btn btn-lg btn-primary" href="/${locale}" role="button">
+					<fmt:message key="home" />
+					&raquo;
+				</a>
+			</p>
+		</div>
+	</section>
 </jsp:attribute>
 </f:layout>

@@ -4,7 +4,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import com.cinema.dao.*;
-import com.cinema.util.DataBaseUtil;
+import com.cinema.exception.RuntimeSQLException;
+import com.cinema.util.DBConnectionPoolHolder;
 
 public class JdbcDaoFactory extends DaoFactory {
 
@@ -35,9 +36,9 @@ public class JdbcDaoFactory extends DaoFactory {
 
 	private Connection getConnection(){
     	try {
-			return DataBaseUtil.getDataSource().getConnection();
+			return DBConnectionPoolHolder.getDataSource().getConnection();
 		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeSQLException(e);
 		}
     }
 

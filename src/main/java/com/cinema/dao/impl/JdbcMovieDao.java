@@ -11,6 +11,7 @@ import com.cinema.dao.MovieDao;
 import com.cinema.entity.Movie;
 import com.cinema.entity.Seance;
 import com.cinema.entity.User;
+import com.cinema.exception.RuntimeSQLException;
 
 public class JdbcMovieDao implements MovieDao {
 	
@@ -21,7 +22,7 @@ public class JdbcMovieDao implements MovieDao {
 	}
 
 	@Override
-	public Movie findBySeance(Seance seance) throws SQLException {
+	public Movie findBySeance(Seance seance) {
 		String sql = "SELECT m.* FROM movie m "
 				+ "INNER JOIN seance s ON s.movie_id = m.movie_id "
 				+ "WHERE s.id";
@@ -42,13 +43,15 @@ public class JdbcMovieDao implements MovieDao {
             
             movie.setSeances(new ArrayList<Seance>());
             
-        }
+        } catch (SQLException e) {
+			throw new RuntimeSQLException(e);
+		}
 		
 		return movie;
 	}
 	
 	@Override
-	public List<Movie> findByUser(User user) throws SQLException {
+	public List<Movie> findByUser(User user) {
 		String sql = "SELECT m.* FROM movie m "
 				+ "INNER JOIN user_movie m2m ON m2m.user_id = ? AND m2m.movie_id = m.id";
 		
@@ -64,6 +67,8 @@ public class JdbcMovieDao implements MovieDao {
                 }
             }
             
+		} catch (SQLException e) {
+			throw new RuntimeSQLException(e);
 		}
            
 		
@@ -79,11 +84,11 @@ public class JdbcMovieDao implements MovieDao {
         		.build();
     }
 	
-	public void close()  {
+	public void close() {
         try {
             connection.close();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeSQLException(e);
         }
     }
 	
