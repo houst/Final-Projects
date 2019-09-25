@@ -2,7 +2,7 @@
 <%@taglib prefix="f" tagdir="/WEB-INF/tags/fragment" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="fnl" uri="/WEB-INF/tags/contains.tld" %>
+<%@ taglib prefix="fnl" uri="/WEB-INF/tags/list-func.tld" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <fmt:setLocale value="${sessionScope.locale}"/>
@@ -11,7 +11,7 @@
 <c:set var="locale" value="${sessionScope.locale}" />
 
 <f:layout>
-<jsp:attribute name="title">Main page</jsp:attribute> 
+<jsp:attribute name="title"><fmt:message key="edit"/> <fmt:message key="user"/> ${user.id}</jsp:attribute> 
 <jsp:attribute name="content">
 
 <section class="container">

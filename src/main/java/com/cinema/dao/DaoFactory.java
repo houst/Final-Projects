@@ -12,15 +12,14 @@ public abstract class DaoFactory {
     public abstract TicketDao createTicketDao();
     public abstract MovieDao createMovieDao();
 
-    public static DaoFactory getInstance(){
-       if( daoFactory == null ){
-           synchronized (DaoFactory.class){
-               if(daoFactory==null){
-                   DaoFactory temp = new JdbcDaoFactory();
-                   daoFactory = temp;
+    public static DaoFactory getInstance() {
+       if (daoFactory == null) {
+           synchronized (DaoFactory.class) {
+               if (daoFactory == null) {
+            	   daoFactory = new JdbcDaoFactory();
                }
            }
-       }   return daoFactory;
-
+       }   
+       return daoFactory;
     }
 }

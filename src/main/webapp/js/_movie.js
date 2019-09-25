@@ -15,13 +15,11 @@ jQuery(document).ready(function ($) {
 		var title = form.find('input[name="title"]');
 		var duration = form.find('input[name="duration"]');
 		var description = form.find('input[name="description"]');
-		var _csrf = form.find('input[name="_csrf"]');
 
 		var data = {
 			title: title.val(),
 			duration: duration.val(),
 			description: description.val(),
-			_csrf: _csrf.val()
 		};
 
 		$.ajax({
@@ -36,7 +34,7 @@ jQuery(document).ready(function ($) {
 				form.jmspinner(false);
 			}
 		}).done((responseText, statusText, response) => {
-			window.location.href = $.fn.addParameterToUrlIfExist("/en/movies", "movieadded", "true");
+			window.location.href = $.fn.addParameterToUrlIfExist("/en/movie", "movieadded", "true");
 		}).fail((response, statusText) => {
 			
 		});
@@ -59,21 +57,19 @@ jQuery(document).ready(function ($) {
 		var title = form.find('input[name="title"]');
 		var duration = form.find('input[name="duration"]');
 		var description = form.find('input[name="description"]');
-		var _csrf = form.find('input[name="_csrf"]');
 
 		var data = {
 			movieId: movieId.val(),
 			title: title.val(),
 			duration: duration.val(),
 			description: description.val(),
-			_csrf: _csrf.val()
 		};
 
 		$.ajax({
 			data: data,
 			timeout: 1000,
 			type: 'PUT',
-			url: '/movie/' + movieId.val(),
+			url: '/movie',
 			beforeSend: function () {
 				form.jmspinner();
 			},

@@ -78,4 +78,12 @@ public class JdbcRoleDao implements RoleDao {
 		create(user);
 	}
 	
+	public void close() {
+        try {
+			connection.close();
+		} catch (SQLException e) {
+			throw new RuntimeSQLException(e);
+		}
+    }
+	
 }

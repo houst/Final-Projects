@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,8 +21,13 @@ import org.slf4j.LoggerFactory;
 
 import com.cinema.config.AppConfig;
 import com.cinema.controller.command.*;
+import com.cinema.entity.Movie;
 import com.cinema.entity.Role;
+import com.cinema.entity.Seance;
 import com.cinema.entity.User;
+import com.cinema.service.MovieService;
+import com.cinema.service.SeanceService;
+import com.cinema.service.TicketService;
 import com.cinema.service.UserService;
 import com.cinema.util.DBConnectionPoolHolder;
 
@@ -32,17 +38,19 @@ public class Servlet extends HttpServlet {
 	
 	private static Logger log = LoggerFactory.getLogger(Servlet.class);
 	
-	private Map<String, Command> commands = new HashMap<>();
+	private final Map<String, Command> commands = new HashMap<>();
 	
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		commands.put("/error", new ErrorCommand());
         commands.put("/logout", new LogoutCommand());
         commands.put("/login", new LoginCommand());
+        commands.put("/movie", new MovieCommand());
+        commands.put("/seance", new SeanceCommand());
         commands.put("/user", new UserCommand());
         commands.put("/", new IndexCommand());
         
-		initDb();   
+		initDb();
 	}
 	
 	@Override
@@ -71,7 +79,10 @@ public class Servlet extends HttpServlet {
 		path = path.length() > 3 && AppConfig.LOCALE_PREFIXES.contains(path.split("/")[1]) ? "/".concat(path.split("/")[2]) :
 			path.length() == 3 && AppConfig.LOCALE_PREFIXES.contains(path.substring(1)) ? "/" : path;
 		log.debug("IN processRequest() - requestURI after processing: \"{}\"", path);
-		
+		log.error("Error Example");
+		log.warn("Warning Example");
+		log.info("Info Example");
+		log.trace("Trace Example");
 		req.setAttribute("path", path);
 		
         Command command = commands.getOrDefault(path, request -> "/error");
@@ -107,6 +118,7 @@ public class Servlet extends HttpServlet {
 			String sql5 = "DELETE FROM seance";
 			String sql6 = "DELETE FROM movie";
 			BasicDataSource dataSource = DBConnectionPoolHolder.getDataSource();
+			dataSource.setMaxTotal(10);
 			try ( Connection connection = dataSource.getConnection();
 	                PreparedStatement pstmt1 = connection.prepareStatement(sql1);
 					PreparedStatement pstmt2 = connection.prepareStatement(sql2);
@@ -137,20 +149,22 @@ public class Servlet extends HttpServlet {
         			.enabled(true)
         			.build());
 			
+			// Add seances, movies and tickets
+			MovieService movieService = new MovieService();
+			SeanceService seanceService = new SeanceService();
+			TicketService ticketService = new TicketService();
 			for (int i = 1; i <= 12; i++) {
-				userService.create(User.builder()
-	        			.email("goodman." + i + "@gmail.com")
-	        			.password("1111")
-	        			.authorities(Arrays.asList(Role.USER))
-	        			.username("Man-" + i)
-	        			.tel("+380991122333")
-	        			.accountNonExpired(true)
-	        			.accountNonLocked(true)
-	        			.credentialsNonExpired(true)
-	        			.enabled(true)
-	        			.build());
+				Movie movie = movieService.create(Movie.builder()
+						.title("Transporter " + i)
+						.duration(150)
+						.description("Some long description about movie")
+						.build());
+				seanceService.create(Seance.builder()
+						.movie(movie)
+						.startDateTime(LocalDateTime.of(2019, 10, i, 12, 00))
+						.tickets(ticketService.generateAvailableTickets())
+						.build());
 			}
-			
 			
 		} catch (Exception e) {
 			e.printStackTrace();

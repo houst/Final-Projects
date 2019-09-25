@@ -13,53 +13,61 @@ import com.cinema.exception.RuntimeSQLException;
 
 public class UserService {
 	
-	private UserDao repo = DaoFactory.getInstance().createUserDao();
+	private DaoFactory daoFactory = DaoFactory.getInstance();
 	
 	public User findByEmail(String email) throws EmailNotFoundException {
-		try {
+		try (UserDao repo = daoFactory.createUserDao()) {
 			return repo.findByEmail(email);
 		} catch (RuntimeException e) {
 			throw new EmailNotFoundException("There is no user with this email: " + email);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 
 	public User create(User newUser) throws EmailExistsException {
-		try {
+		try (UserDao repo = daoFactory.createUserDao()) {
 			return repo.create(newUser);
 		} catch (RuntimeException e) {
 			throw new EmailExistsException("There is already exists user with this email: " + newUser.getEmail());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 
 	public List<User> findAll(int page, int size) {
-		try {
+		try (UserDao repo = daoFactory.createUserDao()) {
 			return repo.findAllUsers(page, size); 
-		} catch (RuntimeException e) {
+		} catch (Exception e) {
 			return new ArrayList<>();
-		}
+		} 
 	}
 
 	public long findCount() {
-		try {
+		try (UserDao repo = daoFactory.createUserDao()) {
 			return repo.findCount();
-		} catch (RuntimeException e) {
-			return 0;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 
 	public User findById(int id) throws IdNotFoundException {
-		try {
+		try (UserDao repo = daoFactory.createUserDao()) {
 			return repo.findById(id);
 		} catch (RuntimeSQLException e) {
 			throw new IdNotFoundException("There is no user with this id: " + id);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 
 	public User update(User user) throws IdNotFoundException {
-		try {
+		try (UserDao repo = daoFactory.createUserDao()) {
 			return repo.update(user);
 		} catch (RuntimeSQLException e) {
 			throw new IdNotFoundException("Thre is no user for updating with this id: " + user.getId());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 	

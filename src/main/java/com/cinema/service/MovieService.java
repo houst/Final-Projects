@@ -6,7 +6,6 @@ import java.util.List;
 import com.cinema.dao.DaoFactory;
 import com.cinema.dao.MovieDao;
 import com.cinema.entity.Movie;
-import com.cinema.entity.User;
 import com.cinema.exception.IdNotFoundException;
 import com.cinema.exception.RuntimeSQLException;
 import com.cinema.exception.TitleExistsException;
@@ -16,15 +15,24 @@ public class MovieService {
 	
 	private MovieDao repo = DaoFactory.getInstance().createMovieDao();
 	
-	public User findByTitle(String title) throws TitleNotFoundException {
+	public Movie findByTitle(String title) throws TitleNotFoundException {
 		try {
 			return repo.findByTitle(title);
 		} catch (RuntimeException e) {
 			throw new TitleNotFoundException("There is no movie with this title: " + title);
 		}
 	}
+	
+	public List<Movie> findByTitleStartsWith(String title) {
+		try {
+			return repo.findByTitleStartsWith(title);
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			return new ArrayList<>();
+		}
+	}
 
-	public User create(Movie newMovie) throws TitleExistsException {
+	public Movie create(Movie newMovie) throws TitleExistsException {
 		try {
 			return repo.create(newMovie);
 		} catch (RuntimeException e) {
@@ -48,7 +56,7 @@ public class MovieService {
 		}
 	}
 
-	public Movie findById(int id) throws IdNotFoundException {
+	public Movie findById(long id) throws IdNotFoundException {
 		try {
 			return repo.findById(id);
 		} catch (RuntimeSQLException e) {
@@ -61,6 +69,14 @@ public class MovieService {
 			return repo.update(movie);
 		} catch (RuntimeSQLException e) {
 			throw new IdNotFoundException("Thre is no movie for updating with this id: " + movie.getId());
+		}
+	}
+
+	public List<Movie> findByAll() {
+		try {
+			return repo.findAll(); 
+		} catch (RuntimeException e) {
+			return new ArrayList<>();
 		}
 	}
 	

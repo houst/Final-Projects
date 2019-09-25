@@ -12,19 +12,17 @@ jQuery(document).ready(function ($) {
 			return;
 		}
 
-		var invalidDataInput = form.find('.alertify-log-error');
-		var successDataInput = form.find('.alertify-log-success');
+		// var invalidDataInput = form.find('.alertify-log-error');
+		// var successDataInput = form.find('.alertify-log-success');
 
 		var date_submit = form.find('input[name="date_submit"]');
 		var time = form.find('input[name="time"]');
 		var begin = date_submit.val() + 'T' + time.val();
 		var movieTitle = form.find('.mdb-select option:selected');
-		var _csrf = form.find('input[name="_csrf"]');
 
 		var data = {
 			begin: begin,
 			movieTitle: movieTitle.val(),
-			_csrf: _csrf.val()
 		};
 
 		$.ajax({
@@ -39,13 +37,12 @@ jQuery(document).ready(function ($) {
 				form.jmspinner(false);
 			}
 		}).done((responseText, statusText, response) => {
-			successDataInput.hide();
-			invalidDataInput.hide();
+			// successDataInput.hide();
+			// invalidDataInput.hide();
 			window.location.href = $.fn.addParameterToUrlIfExist(window.location.href, "added", "true");
 		}).fail((response, statusText) => {
-			$.fn.sleep(1300);
-			successDataInput.hide();
-			invalidDataInput.show();
+			// successDataInput.hide();
+			// invalidDataInput.show();
 		});
 	});
 

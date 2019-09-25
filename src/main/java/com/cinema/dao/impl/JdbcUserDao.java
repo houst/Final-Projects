@@ -5,9 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.cinema.dao.UserDao;
+import com.cinema.entity.Movie;
+import com.cinema.entity.Ticket;
 import com.cinema.entity.User;
 import com.cinema.exception.RuntimeSQLException;
 
+@SuppressWarnings("resource")
 public class JdbcUserDao implements UserDao {
 	
 	private Connection connection;
@@ -82,6 +85,36 @@ public class JdbcUserDao implements UserDao {
 		return user;
 	}
 	
+	@Override
+	public User findByTicket(Ticket ticket) {
+		String sql = "SELECT u.* FROM user u "
+				+ "INNER JOIN ticket t ON t.user_id = u.id "
+				+ "WHERE t.id = ?";
+		User user = null;
+		
+		try ( PreparedStatement pstmt = connection.prepareStatement(sql);) {
+			
+			pstmt.setLong(1, ticket.getId());
+            try (ResultSet resultSet = pstmt.executeQuery();) {
+                if (resultSet.next()) {
+                	user = extractFromResultSet(resultSet);
+                }
+            }
+            
+            if (user == null) {
+    			throw new SQLException("There is no user with this ticket id: " + ticket.getId());
+    		}
+            
+            user.setWatchedMovies(new ArrayList<Movie>());
+            user.setTickets(new ArrayList<Ticket>());
+            
+        } catch (SQLException e) {
+			throw new RuntimeSQLException(e);
+		}
+		
+		return user;
+	}
+
 	@Override
 	public long findCount() {
 		String sql = "SELECT COUNT(*) FROM user";
@@ -208,7 +241,6 @@ public class JdbcUserDao implements UserDao {
             connection.commit();
 			
         } catch (SQLException e) {
-        	e.printStackTrace();
         	throw new RuntimeSQLException(e);
 		}
 		
