@@ -38,4 +38,7 @@ public class Movie {
 	@OneToMany(mappedBy = "movie")
 	private List<Seance> seances;
 	
+	@ManyToMany(mappedBy = "watchedMovies")
+	private List<User> usersWatched;
+	
 }

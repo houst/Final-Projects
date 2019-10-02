@@ -47,6 +47,14 @@ public class User implements UserDetails {
     @Column(name = "tel")
     private String tel;
     
+    @ManyToMany
+    @JoinTable(
+        name = "user_movie", 
+        joinColumns = { @JoinColumn(name = "user_id") }, 
+        inverseJoinColumns = { @JoinColumn(name = "movie_id") }
+    )
+    private List<Movie> watchedMovies;
+    
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
     private List<Ticket> tickets;
 	
