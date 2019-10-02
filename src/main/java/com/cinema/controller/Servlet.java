@@ -16,8 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.cinema.config.AppConfig;
 import com.cinema.controller.command.*;
@@ -36,7 +36,7 @@ public class Servlet extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private static Logger log = LoggerFactory.getLogger(Servlet.class);
+	private static Logger log = LogManager.getLogger(Servlet.class);
 	
 	private final Map<String, Command> commands = new HashMap<>();
 	
@@ -75,26 +75,22 @@ public class Servlet extends HttpServlet {
 	
 	private void processRequest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String path = req.getRequestURI();
+		log.trace("URI={}", path);
+		
+		req.setAttribute("path", path.length() > 3 ? path.substring(3) : "");
 		
 		path = path.length() > 3 && AppConfig.LOCALE_PREFIXES.contains(path.split("/")[1]) ? "/".concat(path.split("/")[2]) :
 			path.length() == 3 && AppConfig.LOCALE_PREFIXES.contains(path.substring(1)) ? "/" : path;
-		log.debug("IN processRequest() - requestURI after processing: \"{}\"", path);
-		log.error("Error Example");
-		log.warn("Warning Example");
-		log.info("Info Example");
-		log.trace("Trace Example");
-		req.setAttribute("path", path);
 		
-        Command command = commands.getOrDefault(path, request -> "/error");
-        log.debug("IN processRequest() - process command: {}", command.getClass().getSimpleName());
+        Command command = commands.getOrDefault(path, p -> "/error");
+        
+        log.trace("{} is processing...", command.getClass().getSimpleName());
         
         String result = command.execute(req);
-        log.debug("IN processRequest() - result of processed command: \"{}\"", result);
         
         if (result.startsWith("error")) {
         	resp.sendError(Integer.parseInt(result.substring(6)));
         } else if (result.startsWith("json")) {
-        	resp.setContentType("application/json");
         	resp.getWriter().write(result.substring(5));
         } else if (result.startsWith("redirect")) {
         	resp.sendRedirect(result.substring(9));
@@ -167,7 +163,7 @@ public class Servlet extends HttpServlet {
 			}
 			
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("IN initDb() error has occurred", e);
 		}
 	}
 	
