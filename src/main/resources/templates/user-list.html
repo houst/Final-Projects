@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{fragment/layout}">
+
+<head>
+	<title>[[#{user.list}]]</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container">
+
+		<div class="jumbotron">
+			<h1><span th:utext="#{user.list}"></span></h1>
+			<p>
+				<table class="table table-bordered table-responsive-md table-striped text-center">
+					<thead>
+						<tr>
+							<th class="text-center"><span th:utext="#{user.email}"></span></th>
+							<th class="text-center"><span th:utext="#{user.name}"></span></th>
+							<th class="text-center"><span th:utext="#{user.number}"></span></th>
+							<th class="text-center"><span th:utext="#{user.roles}"></span></th>
+							<th class="text-center"> </th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${users.empty}">
+							<td colspan="2"> No Users Available </td>
+						</tr>
+						<tr th:each="user : ${users}">
+							<td class="pt-3-half"><span th:text="${user.email}"></span></td>
+							<td class="pt-3-half"><span th:text="${user.username}"></span></td>
+							<td class="pt-3-half"><span th:text="${user.tel}"></span></td>
+							<td class="pt-3-half"><span th:text="${user.authorities}"></span></td>
+							<td>
+								<span class="table-edit"><a th:href="@{'/' + ${#locale} + '/user/' + ${user.id} + '/edit'}"
+										class="btn btn-warning btn-rounded btn-sm my-0">Edit</a></span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</p>
+		</div>
+	</div>
+</body>
+
+</html>

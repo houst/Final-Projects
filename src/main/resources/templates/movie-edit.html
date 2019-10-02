@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{fragment/layout}">
+
+<head>
+	<title>[[ @{#{edit} + ' ' + #{movie}} ]]</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container">
+
+		<div class="jumbotron">
+			<h1>[[ @{#{edit} + ' ' + #{movie}} ]]</h1>
+			<div class="col-md-6">
+				<form action="/movie" id="edit-movie-form" class="needs-validation" method="PUT" novalidate>
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+					<input type="hidden" name="movieId" th:value="${movie.id}" />
+
+					<div class="md-form form-sm">
+						<i class="fas fa-film prefix"></i>
+						<input type="text" name="title" class="form-control form-control-sm" th:value="${movie.title}" required>
+						<label for="title">[[#{movie.title}]]</label>
+					</div>
+
+					<div class="md-form form-sm">
+						<i class="far fa-clock prefix"></i>
+						<input type="number" name="duration" class="form-control form-control-sm" th:value="${movie.duration}" required>
+						<label for="duration">[[#{movie.duration}]]</label>
+					</div>
+
+					<div class="md-form form-sm">
+						<i class="fas fa-phone prefix"></i>
+						<input type="text" name="description" class="form-control form-control-sm" th:value="${movie.description}" required>
+						<label for="description">[[#{movie.description}]]</label>
+					</div>
+
+					<div class="text-left form-sm mt-4">
+						<button type="submit" class="btn btn-info waves-effect waves-light">
+							[[ #{save} ]]
+						</button>
+					</div>
+				</form>
+				</div>
+				
+			
+		</div>
+	</div>
+</body>
+
+</html>

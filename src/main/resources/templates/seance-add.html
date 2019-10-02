@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{fragment/layout}">
+
+<head>
+	<title>[[ @{#{add} + ' ' + #{seance}} ]]</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container">
+
+		<div class="jumbotron">
+			<h1>[[ @{#{add} + ' ' + #{seance}} ]]</h1>
+			<div class="col-md-6">
+				<form action="/seance" id="add-seance-form" class="needs-validation" method="POST" novalidate>
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+					<div th:if="${added}" class="alertify-log alertify-log-success alertify-log-show"
+						style="margin-top:0">
+						[[ #{seance.added.success} ]]
+					</div>
+
+					<div class="alertify-log alertify-log-error alertify-log-show"
+						style="display:none;margin-top:0">
+						[[ #{seance.added.fail} ]]
+					</div>
+
+					<!-- <div class="md-form form-sm">
+						<i class="fas fa-film prefix"></i>
+						<input type="text" name="begin" class="form-control form-control-sm" required>
+						<label for="begin">[[#{seance.start-date-time}]]</label>
+					</div> -->
+
+					<div class="md-form">
+						<i class="far fa-calendar-alt prefix"></i>
+						<input type="text" name="date" id="date-picker-example" class="form-control datepicker" required>
+						<label for="date-picker-example">[[#{date}]]</label>
+					</div>
+
+					<div class="md-form">
+						<i class="far fa-clock prefix"></i>
+						<input name="time" type="text" id="input_starttime" class="form-control timepicker" required>
+						<label for="input_starttime">[[#{time}]]</label>
+					</div>
+
+					<select class="mdb-select md-form" th:searchable="#{search}" required>
+						<option value="" disabled selected>[[#{choose}]] [[#{movie}]]</option>
+						<option th:each="movie : ${movies}" th:value="${movie.title}">[[${movie.title}]]</option>
+					</select>
+
+					<div class="text-left form-sm mt-4">
+						<button type="submit" class="btn btn-success waves-effect waves-light">
+							<i class="fas fa-plus"></i>
+							[[ #{add} ]]
+						</button>
+					</div>
+				</form>
+				</div>
+				
+			
+		</div>
+	</div>
+</body>
+
+</html>

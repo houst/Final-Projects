@@ -1,0 +1,93 @@
+<!DOCTYPE HTML>
+<html xmlns:layout="http://www.w3.org/1999/xhtml" layout:decorate="~{fragment/layout}">
+
+<head>
+	<title>[[#{movie.list}]]</title>
+</head>
+
+<body>
+	<div layout:fragment="content" class="container">
+
+		<div class="jumbotron">
+			<h1><span th:utext="#{movie.list}"></span></h1>
+			<a class="btn btn-success btn-sm" th:href="@{'/' + ${#locale} + '/movie' + '/add'}">
+				<i class="fas fa-plus"></i>
+				<span th:utext="#{add}"></span>
+			</a>
+			<td th:if="${movieadded}">
+				<div class="alertify-log alertify-log-success alertify-log-show"
+					style="margin-top:0">
+					[[ #{movie.add.success} ]]
+				</div>
+			</td>
+			<p>
+				<table class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th class="text-center">[[ #{movie.title} ]]</th>
+							<th class="text-center">[[ #{movie.duration} ]]</th>
+							<th class="text-center">[[ #{movie.description} ]]</th>
+							<th class="text-center">[[ #{movie.seances} ]]</th>
+							<th class="text-center">[[ #{actions} ]]</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${movies.empty}">
+							<td class="text-center" colspan="5"> No Movies Available </td>
+						</tr>
+						<tr th:each="movie : ${movies}">
+							<td class="pt-3-half">[[ ${movie.title} ]]</td>
+							<td class="pt-3-half">[[ ${movie.duration} ]]</td>
+							<td class="pt-3-half">[[ ${movie.description} ]]</td>
+							<td class="pt-3-half">[[ ${movie.seances} ]]</td>
+							<td>
+								<span class="table-edit">
+									<a th:href="@{'/' + ${#locale} + '/movie/' + ${movie.id} + '/edit'}"
+										class="btn btn-outline-warning btn-rounded btn-sm px-2 waves-effect waves-light">
+										<i class="fas fa-pencil-alt mt-0"></i>
+									</a>
+								</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</p>
+			<div class="row">
+				<div class="col-sm-12 col-md-5">
+					<div class="dataTables_info">
+						[[#{pagination.showing}]] 
+						[[${(movies.number + 1) * movies.size - movies.size + 1}]]
+						[[#{pagination.to}]]
+						<span th:text="${((movies.number + 1) * movies.size) > movies.totalElements ? movies.totalElements : ((movies.number + 1) * movies.size)}"></span>
+						[[#{pagination.of}]]
+						[[${movies.totalElements}]]
+						[[#{pagination.entries}]]
+					</div>
+				</div>
+				<div class="col-sm-12 col-md-7">
+					<div class="dataTables_paginate paging_simple_numbers text-right" 
+						th:if="${movies.totalElements > movies.size}">
+						<ul class="pagination">
+							<li th:class="${movies.hasPrevious()} ? 'paginate_button page-item previous' : 'paginate_button page-item previous disabled'">
+								<a th:href="@{'/' + ${#locale} + '/movies'(page=${movies.number})}" class="page-link">
+									[[#{pagination.previous}]]
+								</a>
+							</li>
+							<li th:each="pageNumber : ${pageNumbers}" 
+								th:class="${pageNumber==movies.number + 1} ? 'paginate_button page-item active' : 'paginate_button page-item'">
+								<a th:href="@{'/' + ${#locale} + '/movies'(page=${pageNumber})}" class="page-link">[[ ${pageNumber} ]]</a>
+							</li>
+							<li th:class="${movies.hasNext()} ? 'paginate_button page-item next' : 'paginate_button page-item next disabled'">
+								<a th:href="@{'/' + ${#locale} + '/movies'(page=${movies.number + 2})}" class="page-link">
+									[[#{pagination.next}]]
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>
